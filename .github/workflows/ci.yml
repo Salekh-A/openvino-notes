@@ -105,7 +105,7 @@ jobs:
 
       - name: Upload detekt SARIF
         if: always() && hashFiles('build/reports/detekt/detekt-merged.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: build/reports/detekt/detekt-merged.sarif
           category: detekt
@@ -149,7 +149,7 @@ jobs:
 
       - name: Upload gitleaks SARIF
         if: always() && hashFiles('build/reports/gitleaks/gitleaks.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: build/reports/gitleaks/gitleaks.sarif
           category: gitleaks
@@ -197,7 +197,7 @@ jobs:
           "${SDKMANAGER}" "platforms;android-${ANDROID_API_LEVEL}" "build-tools;${ANDROID_BUILD_TOOLS}"
 
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           languages: java-kotlin
           build-mode: manual
@@ -206,7 +206,7 @@ jobs:
         run: ./gradlew assembleDebug --stacktrace
 
       - name: Analyze
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
 
   release:
     name: Release
