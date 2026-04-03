@@ -23,8 +23,17 @@ function Get-SdkManagerPath {
 
 $sdkmanager = Get-SdkManagerPath
 
+$platformPackage = "platforms;android-$env:ANDROID_API_LEVEL"
+$sdkPackages = & $sdkmanager --list
+if ($sdkPackages -notmatch [regex]::Escape($platformPackage)) {
+    $fallbackPlatformPackage = "$platformPackage.0"
+    if ($sdkPackages -match [regex]::Escape($fallbackPlatformPackage)) {
+        $platformPackage = $fallbackPlatformPackage
+    }
+}
+
 $packages = @(
-    "platforms;android-$env:ANDROID_API_LEVEL",
+    $platformPackage,
     "build-tools;$env:ANDROID_BUILD_TOOLS"
 )
 

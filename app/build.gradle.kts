@@ -8,13 +8,13 @@ plugins {
 android {
     namespace = "com.itlab.notes"
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     defaultConfig {
         applicationId = "com.itlab.notes"
         minSdk = 33
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
 
@@ -24,10 +24,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -36,26 +33,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    testOptions {
-        managedDevices {
-            localDevices {
-                create("pixel7api34X86") {
-                    device = "Pixel 7"
-                    apiLevel = 34
-                    systemImageSource = "aosp-atd"
-                    require64Bit = true
-                    testedAbi = "x86_64"
-                }
-                create("pixel7api34Arm64") {
-                    device = "Pixel 7"
-                    apiLevel = 34
-                    systemImageSource = "aosp-atd"
-                    require64Bit = true
-                    testedAbi = "arm64-v8a"
-                }
-            }
-        }
     }
 }
 
@@ -77,6 +54,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.materialicons.extended)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

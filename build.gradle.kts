@@ -14,6 +14,7 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
     alias(libs.plugins.kover)
+    kotlin("plugin.serialization") version "2.3.20" apply false
 }
 
 configure<KtlintExtension> {
