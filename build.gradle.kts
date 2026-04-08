@@ -17,6 +17,7 @@ plugins {
     kotlin("plugin.serialization") version "2.3.20" apply false
 }
 
+
 configure<KtlintExtension> {
     android.set(true)
     ignoreFailures.set(false)
@@ -70,9 +71,9 @@ subprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
     apply(plugin = "org.jetbrains.kotlinx.kover")
 
-    dependencyLocking {
-        lockAllConfigurations()
-    }
+   // dependencyLocking {
+    //    lockAllConfigurations()
+   // }
 
     configure<KtlintExtension> {
         android.set(true)

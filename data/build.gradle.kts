@@ -9,7 +9,7 @@ plugins {
 android {
     namespace = "com.itlab.data"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
     defaultConfig {
@@ -37,6 +37,7 @@ android {
             isIncludeAndroidResources = true
         }
     }
+    buildToolsVersion = "37.0.0"
 }
 
 kotlin {

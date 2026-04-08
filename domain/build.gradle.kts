@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.itlab.domain"
     compileSdk {
-        version = release(37)
+        version = release(36)
     }
 
     defaultConfig {
@@ -31,6 +31,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    buildToolsVersion = "37.0.0"
 }
 
 kotlin {
