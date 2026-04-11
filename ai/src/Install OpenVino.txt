@@ -1,3 +1,24 @@
+КОРОТКО:
+
+Окружение
+ОС: Ubuntu 24.04.3 LTS (WSL 2)
+Java: OpenJDK 17.0.18
+OpenVINO Runtime: 2026.2.0 (собран из исходников)
+Hmm466 OpenVINO-Java-API
+JNA: 5.13.0
+
+выводит ту же самую ошибку, что и раньше
+
+Из того что менял при установке OpenVino :
+abulg@HuaweiSx:~/openvino/build$ cmake -DCMAKE_BUILD_TYPE=Release       -DENABLE_SYSTEM_TBB=ON       -DENABLE_INTEL_NPU=OFF 
+так с NPU не собиралось
+
+Полный процесс установки внизу, там же и тесты
+
+
+
+
+
 abulg@HuaweiSx:~$ git clone https://github.com/openvinotoolkit/openvino.git
 Cloning into 'openvino'...
 remote: Enumerating objects: 644867, done.
@@ -134,6 +155,7 @@ abulg@HuaweiSx:~/openvino$ chmod +x install_build_dependencies.sh
 sudo ./install_build_dependencies.sh
 
 ...
+
 After this operation, 1503 kB of additional disk space will be used.
 Get:1 http://archive.ubuntu.com/ubuntu noble/universe amd64 nlohmann-json3-dev all 3.11.3-1 [190 kB]
 Fetched 190 kB in 1s (216 kB/s)
