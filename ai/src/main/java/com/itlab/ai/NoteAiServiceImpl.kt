@@ -7,14 +7,8 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
-<<<<<<< HEAD
 class NoteAiServiceImpl(private val context: Context) : NoteAiService {
 
-=======
-class NoteAiServiceImpl(
-    private val context: Context,
-) : NoteAiService {
->>>>>>> 183ffa3 (feat(ai): integrate Cotype-Nano-CPU for text tagging and summarization)
     private val modelPath: String by lazy {
         copyModelToCache()
     }
@@ -24,7 +18,6 @@ class NoteAiServiceImpl(
         CotypeSummarize.init(modelPath)
     }
 
-<<<<<<< HEAD
     override suspend fun summarize(text: String): String = withContext(Dispatchers.IO) {
         if (text.length < 50) return@withContext text
         val token = CotypeSummarize.summarize(text).toIntOrNull() ?: 0
@@ -42,38 +35,12 @@ class NoteAiServiceImpl(
     }
 
     private fun decodeToken(token: Int): String {
-        return if (token > 1000 && token < 2000) {
-=======
-    override suspend fun summarize(text: String): String =
-        withContext(Dispatchers.IO) {
-            if (text.length < 50) return@withContext text
-            val token = CotypeSummarize.summarize(text).toIntOrNull() ?: 0
-            decodeToken(token)
-        }
-
-    override suspend fun tagTXT(text: String): Set<String> =
-        withContext(Dispatchers.IO) {
-            val token = CotypeTag.tag(text).toIntOrNull() ?: 0
-            val decoded = decodeToken(token)
-            if (decoded.isNotEmpty()) setOf(decoded) else emptySet()
-        }
-
-    override suspend fun tagIMGs(img: List<String>): Set<String> =
-        withContext(Dispatchers.IO) {
-            emptySet()
-        }
-
-    private fun decodeToken(token: Int): String =
-        if (token > 1000 && token < 2000) {
->>>>>>> 183ffa3 (feat(ai): integrate Cotype-Nano-CPU for text tagging and summarization)
+        return if (token in 1001..1999) {
             (token - 1000).toChar().toString()
         } else {
             ""
         }
-<<<<<<< HEAD
     }
-=======
->>>>>>> 183ffa3 (feat(ai): integrate Cotype-Nano-CPU for text tagging and summarization)
 
     private fun copyModelToCache(): String {
         val modelFile = File(context.cacheDir, "openvino_model.xml")
