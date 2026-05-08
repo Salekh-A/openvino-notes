@@ -25,9 +25,7 @@ class AIUseCasesTest {
         override fun observeNotes(): Flow<List<Note>> = flow
 
         override fun observeNotesByFolder(folderId: String): Flow<List<Note>> =
-            flow.map { notes ->
-                notes.filter { it.folderId == folderId }
-            }
+            flow.map { notes -> notes.filter { it.folderId == folderId } }
 
         override suspend fun getNoteById(id: String): Note? = store[id]
 
@@ -86,13 +84,14 @@ class AIUseCasesTest {
                     title = "Test",
                     contentItems =
                         listOf(
-                            ContentItem.Text("Hello"),
+                            ContentItem.Text(text = "Hello"),
                             ContentItem.Image(
                                 source = DataSource(localPath = "path/to/img"),
                                 mimeType = "image/png",
                             ),
                         ),
                 )
+
             repo.createNote(note)
 
             val result = useCase("n1")
@@ -129,8 +128,8 @@ class AIUseCasesTest {
                     title = "Tags",
                     contentItems =
                         listOf(
-                            ContentItem.Text("First line"),
-                            ContentItem.Text("Second line"),
+                            ContentItem.Text(text = "First line"),
+                            ContentItem.Text(text = "Second line"),
                             ContentItem.Image(
                                 source = DataSource(localPath = "/local/image.png"),
                                 mimeType = "image/png",
@@ -139,18 +138,21 @@ class AIUseCasesTest {
                                 source = DataSource(remoteUrl = "https://example.com/image.jpg"),
                                 mimeType = "image/jpg",
                             ),
-                            ContentItem.Link("https://kotlinlang.org"),
+                            ContentItem.Link(url = "https://kotlinlang.org"),
                         ),
                 )
+
             repo.createNote(note)
 
             val result = useCase("n2")
 
             assertEquals("First line\nSecond line", ai.textTagsInput)
+
             assertEquals(
                 listOf("/local/image.png", "https://example.com/image.jpg"),
                 ai.imageTagsInput,
             )
+
             assertEquals(
                 setOf("text-tag-1", "text-tag-2", "image-tag-1", "image-tag-2"),
                 result,
@@ -184,6 +186,7 @@ class AIUseCasesTest {
                     title = "Summary",
                     summary = "old summary",
                 )
+
             repo.createNote(note)
 
             useCase("n3", "new summary")
@@ -219,6 +222,7 @@ class AIUseCasesTest {
                     title = "Tags",
                     tags = setOf("old"),
                 )
+
             repo.createNote(note)
 
             val newTags = setOf("kotlin", "android", "openvino")
