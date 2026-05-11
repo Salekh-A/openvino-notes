@@ -1,7 +1,9 @@
 package com.itlab.domain
 
+import com.itlab.domain.model.Note
 import com.itlab.domain.model.NoteFolder
 import com.itlab.domain.repository.NoteFolderRepository
+import com.itlab.domain.repository.NotesRepository
 import com.itlab.domain.usecase.folderusecase.CreateFolderUseCase
 import com.itlab.domain.usecase.folderusecase.DeleteFolderUseCase
 import com.itlab.domain.usecase.folderusecase.GetFolderUseCase
@@ -50,6 +52,20 @@ class FolderUseCasesTest {
         }
     }
 
+    private class FakeNotesRepo : NotesRepository {
+        override fun observeNotes() = MutableStateFlow<List<Note>>(emptyList())
+
+        override fun observeNotesByFolder(folderId: String) = MutableStateFlow<List<Note>>(emptyList())
+
+        override suspend fun getNoteById(id: String): Note? = null
+
+        override suspend fun createNote(note: Note): String = note.id
+
+        override suspend fun updateNote(note: Note) = Unit
+
+        override suspend fun deleteNote(id: String) = Unit
+    }
+
     @Test
     fun createFolder_and_getFolder() =
         runBlocking {
@@ -96,7 +112,7 @@ class FolderUseCasesTest {
             val repo = FakeFolderRepo()
 
             val create = CreateFolderUseCase(repo)
-            val delete = DeleteFolderUseCase(repo)
+            val delete = DeleteFolderUseCase(repo, FakeNotesRepo())
             val get = GetFolderUseCase(repo)
 
             val folder = NoteFolder(name = "Test")
@@ -122,5 +138,13 @@ class FolderUseCasesTest {
             val list = observe().first()
 
             assertEquals(1, list.size)
+        }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun createFolder_blankName_throws(): Unit =
+        runBlocking {
+            val repo = FakeFolderRepo()
+            val create = CreateFolderUseCase(repo)
+            create(NoteFolder(name = "   "))
         }
 }

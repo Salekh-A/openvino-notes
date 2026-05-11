@@ -1,6 +1,7 @@
 package com.itlab.domain.usecase.noteusecase
 
 import com.itlab.domain.repository.NotesRepository
+import com.itlab.domain.usecase.requireNotBlank
 import kotlin.time.Clock
 
 class ApplyTagsUseCase(
@@ -10,13 +11,15 @@ class ApplyTagsUseCase(
         noteId: String,
         newTags: Set<String>,
     ) {
+        requireNotBlank(noteId, "Note id")
         val note =
             repo.getNoteById(noteId)
                 ?: throw IllegalArgumentException("Note not found")
+        val normalizedTags = newTags.map { it.trim() }.filter { it.isNotBlank() }.toSet()
 
         val updated =
             note.copy(
-                tags = newTags,
+                tags = normalizedTags,
                 updatedAt =
                     Clock.System
                         .now(),

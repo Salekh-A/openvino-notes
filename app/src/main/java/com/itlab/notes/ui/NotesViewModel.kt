@@ -11,7 +11,6 @@ import com.itlab.domain.model.NoteFolder
 import com.itlab.notes.ui.notes.DirectoryItemUi
 import com.itlab.notes.ui.notes.NoteItemUi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class NotesViewModel(
@@ -89,14 +88,6 @@ class NotesViewModel(
     private fun deleteDirectory(directoryId: String) {
         if (directoryId == "all") return
         viewModelScope.launch {
-            val notesInDirectory =
-                useCases
-                    .observeNotesByFolderUseCase(directoryId)
-                    .firstOrNull()
-                    .orEmpty()
-            notesInDirectory.forEach { note ->
-                useCases.deleteNoteUseCase(note.id)
-            }
             useCases.deleteFolderUseCase(directoryId)
             if ((uiState.screen as? NotesUiScreen.DirectoryNotes)?.directory?.id == directoryId) {
                 backToDirectories()

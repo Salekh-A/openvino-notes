@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.fail
 import org.junit.Test
 
 class ContentItemUseCaseTest {
@@ -144,5 +145,24 @@ class ContentItemUseCaseTest {
             addItem("n1", item)
 
             assertEquals(0, note.contentItems.size)
+        }
+
+    @Test
+    fun add_duplicate_content_item_id_throws() =
+        runBlocking {
+            val repo = FakeNotesRepo()
+            val addItem = AddContentItemUseCase(repo)
+            val note = Note(id = "n1", title = "Test")
+            repo.createNote(note)
+
+            val item = ContentItem.Text(id = "fixed-id", text = "Hello")
+            addItem("n1", item)
+
+            try {
+                addItem("n1", item.copy(text = "World"))
+                fail("Expected IllegalArgumentException")
+            } catch (e: IllegalArgumentException) {
+                assertEquals("Content item with id 'fixed-id' already exists in note 'n1'", e.message)
+            }
         }
 }

@@ -32,7 +32,7 @@ val appModule =
 
         factory { CreateNoteUseCase(get()) }
         factory { CreateFolderUseCase(get()) }
-        factory { DeleteFolderUseCase(get()) }
+        factory { DeleteFolderUseCase(get(), get()) }
         factory { DeleteNoteUseCase(get()) }
         factory { UpdateNoteUseCase(get()) }
         factory { UpdateFolderUseCase(get()) }
@@ -41,7 +41,7 @@ val appModule =
         factory { ObserveFoldersUseCase(get()) }
         factory { UpdateFolderUseCase(get()) }
         factory { GetFolderUseCase(get()) }
-        factory { MoveNoteToFolderUseCase(get()) }
+        factory { MoveNoteToFolderUseCase(get(), get()) }
         factory {
             NotesUseCases(
                 createFolderUseCase = get(),

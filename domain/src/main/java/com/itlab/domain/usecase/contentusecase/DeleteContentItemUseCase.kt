@@ -1,6 +1,7 @@
 package com.itlab.domain.usecase.contentusecase
 
 import com.itlab.domain.repository.NotesRepository
+import com.itlab.domain.usecase.requireNotBlank
 import kotlin.time.Clock
 
 class DeleteContentItemUseCase(
@@ -10,6 +11,8 @@ class DeleteContentItemUseCase(
         noteId: String,
         itemId: String,
     ) {
+        requireNotBlank(noteId, "Note id")
+        requireNotBlank(itemId, "Content item id")
         val note =
             notesRepository.getNoteById(noteId)
                 ?: throw IllegalArgumentException("Note not found: $noteId")

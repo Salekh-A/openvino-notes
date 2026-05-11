@@ -2,13 +2,24 @@ package com.itlab.domain.usecase.folderusecase
 
 import com.itlab.domain.model.NoteFolder
 import com.itlab.domain.repository.NoteFolderRepository
+import com.itlab.domain.usecase.requireNotBlank
+import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
 
 class UpdateFolderUseCase(
     private val repo: NoteFolderRepository,
 ) {
     suspend operator fun invoke(folder: NoteFolder) {
-        val folder = folder.copy(updatedAt = Clock.System.now())
+        requireNotBlank(folder.id, "Folder id")
+        require(folder.id != "all") { "System folder 'all' cannot be renamed" }
+        val normalizedName = folder.name.trim()
+        requireNotBlank(normalizedName, "Folder name")
+        val hasDuplicateName =
+            repo.observeFolders().first().any { existing ->
+                existing.id != folder.id && existing.name.trim().equals(normalizedName, ignoreCase = true)
+            }
+        require(!hasDuplicateName) { "Folder with name '$normalizedName' already exists" }
+        val folder = folder.copy(name = normalizedName, updatedAt = Clock.System.now())
         repo.updateFolder(folder)
     }
 }
