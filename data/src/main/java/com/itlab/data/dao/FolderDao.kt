@@ -20,6 +20,12 @@ interface FolderDao {
     @Query("DELETE FROM folders")
     suspend fun deleteAll()
 
+    @Query("UPDATE folders SET name = :name WHERE id = :id")
+    suspend fun updateName(
+        id: String,
+        name: String,
+    )
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(folder: FolderEntity)
 

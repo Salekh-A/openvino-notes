@@ -3,13 +3,19 @@ package com.itlab.domain.usecase
 import com.itlab.domain.model.NoteFolder
 import com.itlab.domain.repository.NoteFolderRepository
 import kotlinx.datetime.Clock
+import java.util.UUID
 
 class CreateFolderUseCase(
     private val repo: NoteFolderRepository,
 ) {
     suspend operator fun invoke(folder: NoteFolder): String {
-        // discuss
-        val folder = folder.copy(createdAt = Clock.System.now())
+        val now = Clock.System.now()
+        val folder =
+            folder.copy(
+                id = UUID.randomUUID().toString(),
+                createdAt = now,
+                updatedAt = now,
+            )
         return repo.createFolder(folder)
     }
 }

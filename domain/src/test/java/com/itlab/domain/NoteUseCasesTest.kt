@@ -77,19 +77,21 @@ class NoteUseCasesTest {
             val delete = DeleteNoteUseCase(repo)
             val get = GetNoteUseCase(repo)
 
-            val note = Note(id = "n1", title = "A")
+            val note = Note(title = "A")
 
-            create(note)
+            val id = create(note)
 
-            val updated = note.copy(title = "B")
+            val created = get(id)!!
+
+            val updated = created.copy(title = "B")
             update(updated)
 
-            val result = get("n1")
+            val result = get(id)
             assertEquals("B", result?.title)
 
-            delete("n1")
+            delete(id)
 
-            val result2 = get("n1")
+            val result2 = get(id)
             assertNull(result2)
         }
 
@@ -105,12 +107,13 @@ class NoteUseCasesTest {
             val folder = NoteFolder(id = "f1", name = "Folder")
             folderRepo.createFolder(folder)
 
-            val note = Note(id = "n1", title = "Note")
-            createNote(note)
+            val note = Note(title = "Note")
 
-            move("f1", "n1")
+            val noteId = createNote(note)
 
-            val updated = notesRepo.getNoteById("n1")
+            move("f1", noteId)
+
+            val updated = notesRepo.getNoteById(noteId)
 
             assertEquals("f1", updated?.folderId)
         }
@@ -122,8 +125,7 @@ class NoteUseCasesTest {
             val observe = ObserveNotesUseCase(repo)
             val create = CreateNoteUseCase(repo)
 
-            create(Note(id = "n1", title = "Test"))
-
+            create(Note(title = "Test"))
             val list = observe().first()
 
             assertEquals(1, list.size)

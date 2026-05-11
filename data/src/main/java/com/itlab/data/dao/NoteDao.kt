@@ -17,6 +17,9 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE id = :noteId")
     suspend fun getNoteByld(noteId: String): NoteEntity?
 
+    @Query("SELECT * FROM notes WHERE folderId = :folderId ORDER BY updatedAt DESC")
+    fun getNotesByFolder(folderId: String): Flow<List<NoteEntity>>
+
     @Insert
     suspend fun insert(note: NoteEntity)
 

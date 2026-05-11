@@ -14,7 +14,13 @@ interface MediaDao {
     fun getMediaForNoteFlow(noteId: String): Flow<List<MediaEntity>>
 
     @Query("SELECT * FROM media WHERE noteId = :noteId")
-    fun getMediaForNote(noteId: String): List<MediaEntity>
+    suspend fun getMediaForNote(noteId: String): List<MediaEntity>
+
+    @Query("DELETE FROM media WHERE noteId = :noteId")
+    suspend fun deleteByNoteId(noteId: String)
+
+    @Query("DELETE FROM media")
+    suspend fun deleteAll()
 
     @Insert
     suspend fun insert(media: MediaEntity)

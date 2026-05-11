@@ -113,6 +113,7 @@ subprojects {
     }
 
     tasks.withType<Detekt>().configureEach {
+        jvmTarget = "21"
         reports {
             html.required.set(true)
             md.required.set(false)

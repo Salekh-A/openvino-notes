@@ -129,7 +129,6 @@ class NoteMapperTest {
                 isFavorite = true,
                 createdAt = testTime,
                 updatedAt = testTime,
-                summary = "cars",
             )
 
         val resultNote = mapper.toDomain(entity)
@@ -141,7 +140,6 @@ class NoteMapperTest {
 
         assertEquals(originalItems, resultNote.contentItems)
         assertEquals(originalTags, resultNote.tags)
-        assertEquals(entity.summary, resultNote.summary)
     }
 
     @Test

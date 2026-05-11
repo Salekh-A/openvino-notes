@@ -68,7 +68,6 @@ class NoteMapper(
             updatedAt = entity.updatedAt,
             tags = tags,
             isFavorite = entity.isFavorite,
-            summary = entity.summary,
         )
     }
 
