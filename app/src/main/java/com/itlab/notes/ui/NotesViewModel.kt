@@ -11,7 +11,6 @@ import com.itlab.domain.model.NoteFolder
 import com.itlab.notes.ui.notes.DirectoryItemUi
 import com.itlab.notes.ui.notes.NoteItemUi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class NotesViewModel(
@@ -89,14 +88,6 @@ class NotesViewModel(
     private fun deleteDirectory(directoryId: String) {
         if (directoryId == "all") return
         viewModelScope.launch {
-            val notesInDirectory =
-                useCases
-                    .observeNotesByFolderUseCase(directoryId)
-                    .firstOrNull()
-                    .orEmpty()
-            notesInDirectory.forEach { note ->
-                useCases.deleteNoteUseCase(note.id)
-            }
             useCases.deleteFolderUseCase(directoryId)
             if ((uiState.screen as? NotesUiScreen.DirectoryNotes)?.directory?.id == directoryId) {
                 backToDirectories()
@@ -111,10 +102,17 @@ class NotesViewModel(
                 notes = emptyList(),
             )
         notesJob?.cancel()
-        val folderId = directory.id.asDomainFolderId()
+        val isAll = directory.id == "all"
         notesJob =
             viewModelScope.launch {
-                useCases.observeNotesByFolderUseCase(folderId).collect { notes ->
+                val flow =
+                    if (isAll) {
+                        useCases.observeNotesUseCase()
+                    } else {
+                        useCases.observeNotesByFolderUseCase(directory.id)
+                    }
+
+                flow.collect { notes ->
                     uiState =
                         uiState.copy(
                             notes = notes.map { it.toUi() },
@@ -179,21 +177,17 @@ class NotesViewModel(
     }
 
     private fun recomputeDirectories() {
-        if (latestFolders.isEmpty()) return
-
         val countsByFolderId = latestNotes.groupingBy { it.folderId }.eachCount()
         val allNotesCount = latestNotes.size
 
+        val allNotesDir = DirectoryItemUi(id = "all", name = "All Notes", noteCount = allNotesCount)
+
         val directories =
-            latestFolders.map { folder ->
-                val count =
-                    if (folder.id == "all") {
-                        allNotesCount
-                    } else {
-                        countsByFolderId[folder.id] ?: 0
-                    }
-                folder.toUi(noteCount = count)
-            }
+            listOf(allNotesDir) +
+                latestFolders.map { folder ->
+                    val count = countsByFolderId[folder.id] ?: 0
+                    folder.toUi(noteCount = count)
+                }
 
         uiState = uiState.copy(directories = directories)
 
