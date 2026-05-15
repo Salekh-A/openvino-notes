@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -57,6 +58,11 @@ android {
             }
         }
     }
+
+    lint {
+        lintConfig = file("lint.xml")
+        abortOnError = true
+    }
 }
 
 kotlin {
@@ -89,4 +95,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }
