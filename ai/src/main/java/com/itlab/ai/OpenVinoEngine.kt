@@ -187,7 +187,7 @@ class OpenVinoEngine(
 
             if (outputData.isEmpty()) {
                 Log.e(TAG, "Output data is empty")
-                return emptyList()
+                return@runCatching emptyList()
             }
 
             val detections = buildDetections(outputData)
@@ -198,22 +198,21 @@ class OpenVinoEngine(
         }
     }
 
+    // Вспомогательная функция без break/continue
     private fun buildDetections(outputData: FloatArray): List<YoloDetection> {
-        val detections = mutableListOf<YoloDetection>()
-
         if (outputData.size < MAX_DETECTIONS * 6) {
             Log.w(TAG, "Unexpected output format, size: ${outputData.size}")
-            return detections
+            return emptyList()
         }
 
-        for (i in 0 until MAX_DETECTIONS) {
-            val base = i * 6
-            if (base + 5 >= outputData.size) break
+        return (0 until MAX_DETECTIONS)
+            .mapNotNull { i ->
+                val base = i * 6
+                if (base + 5 >= outputData.size) return@mapNotNull null
 
-            val confidence = outputData[base + 4]
-            if (confidence <= CONF_THRESHOLD) continue
+                val confidence = outputData[base + 4]
+                if (confidence <= CONF_THRESHOLD) return@mapNotNull null
 
-            detections.add(
                 YoloDetection(
                     x1 = (outputData[base] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
                     y1 = (outputData[base + 1] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
@@ -221,11 +220,8 @@ class OpenVinoEngine(
                     y2 = (outputData[base + 3] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
                     confidence = confidence,
                     classId = outputData[base + 5].toInt(),
-                ),
-            )
-        }
-
-        return detections
+                )
+            }
     }
 
     private fun getTensorDataAsFloatArray(tensor: Tensor): FloatArray =
