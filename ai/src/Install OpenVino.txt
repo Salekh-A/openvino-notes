@@ -1,0 +1,952 @@
+КОРОТКО:
+
+Окружение
+ОС: Ubuntu 24.04.3 LTS (WSL 2)
+Java: OpenJDK 17.0.18
+OpenVINO Runtime: 2026.2.0 (собран из исходников)
+Hmm466 OpenVINO-Java-API
+JNA: 5.13.0
+
+выводит ту же самую ошибку, что и раньше
+
+Из того что менял при установке OpenVino :
+abulg@HuaweiSx:~/openvino/build$ cmake -DCMAKE_BUILD_TYPE=Release       -DENABLE_SYSTEM_TBB=ON       -DENABLE_INTEL_NPU=OFF 
+так с NPU не собиралось
+
+Полный процесс установки внизу, там же и тесты
+
+
+
+
+
+abulg@HuaweiSx:~$ git clone https://github.com/openvinotoolkit/openvino.git
+Cloning into 'openvino'...
+remote: Enumerating objects: 644867, done.
+remote: Counting objects: 100% (331/331), done.
+remote: Compressing objects: 100% (252/252), done.
+Receiving objects: 100% (644867/644867), 904.88 MiB | 696.00 KiB/s, done.
+remote: Total 644867 (delta 155), reused 79 (delta 79), pack-reused 644536 (from 3)
+Resolving deltas: 100% (499941/499941), done.
+Updating files: 100% (16763/16763), done.
+
+
+
+abulg@HuaweiSx:~/openvino$ git submodule update --init --recursive
+Submodule 'ncc' (https://github.com/nithinn/ncc.git) registered for path 'cmake/developer_package/ncc_naming_style/ncc'
+Submodule 'src/bindings/python/thirdparty/pybind11' (https://github.com/pybind/pybind11.git) registered for path 'src/bindings/python/thirdparty/pybind11'
+Submodule 'ARMComputeLibrary' (https://github.com/ARM-software/ComputeLibrary.git) registered for path 'src/plugins/intel_cpu/thirdparty/ComputeLibrary'
+Submodule 'src/plugins/intel_cpu/thirdparty/kleidiai' (https://github.com/ARM-software/kleidiai.git) registered for path 'src/plugins/intel_cpu/thirdparty/kleidiai'
+Submodule 'src/plugins/intel_cpu/thirdparty/libxsmm' (https://github.com/libxsmm/libxsmm.git) registered for path 'src/plugins/intel_cpu/thirdparty/libxsmm'
+Submodule 'src/plugins/intel_cpu/thirdparty/mlas' (https://github.com/openvinotoolkit/mlas.git) registered for path 'src/plugins/intel_cpu/thirdparty/mlas'
+Submodule 'src/plugins/intel_cpu/thirdparty/onednn' (https://github.com/openvinotoolkit/oneDNN.git) registered for path 'src/plugins/intel_cpu/thirdparty/onednn'
+Submodule 'src/plugins/intel_cpu/thirdparty/xbyak_riscv' (https://github.com/herumi/xbyak_riscv.git) registered for path 'src/plugins/intel_cpu/thirdparty/xbyak_riscv'
+Submodule 'thirdparty/onednn_gpu' (https://github.com/oneapi-src/oneDNN.git) registered for path 'src/plugins/intel_gpu/thirdparty/onednn_gpu'
+Submodule 'src/plugins/intel_npu/thirdparty/level-zero-ext' (https://github.com/intel/level-zero-npu-extensions.git) registered for path 'src/plugins/intel_npu/thirdparty/level-zero-ext'
+Submodule 'src/plugins/intel_npu/thirdparty/yaml-cpp' (https://github.com/jbeder/yaml-cpp.git) registered for path 'src/plugins/intel_npu/thirdparty/yaml-cpp'
+Submodule 'thirdparty/flatbuffers/flatbuffers' (https://github.com/google/flatbuffers.git) registered for path 'thirdparty/flatbuffers/flatbuffers'
+Submodule 'thirdparty/gflags/gflags' (https://github.com/gflags/gflags.git) registered for path 'thirdparty/gflags/gflags'
+Submodule 'thirdparty/gtest/gtest' (https://github.com/openvinotoolkit/googletest.git) registered for path 'thirdparty/gtest/gtest'
+Submodule 'thirdparty/ittapi/ittapi' (https://github.com/intel/ittapi.git) registered for path 'thirdparty/ittapi/ittapi'
+Submodule 'thirdparty/json/nlohmann_json' (https://github.com/nlohmann/json.git) registered for path 'thirdparty/json/nlohmann_json'
+Submodule 'thirdparty/level_zero/level-zero' (https://github.com/oneapi-src/level-zero.git) registered for path 'thirdparty/level_zero/level-zero'
+Submodule 'thirdparty/ocl/cl_headers' (https://github.com/KhronosGroup/OpenCL-Headers.git) registered for path 'thirdparty/ocl/cl_headers'
+Submodule 'thirdparty/ocl/clhpp_headers' (https://github.com/KhronosGroup/OpenCL-CLHPP.git) registered for path 'thirdparty/ocl/clhpp_headers'
+Submodule 'thirdparty/ocl/icd_loader' (https://github.com/KhronosGroup/OpenCL-ICD-Loader.git) registered for path 'thirdparty/ocl/icd_loader'
+Submodule 'thirdparty/onnx' (https://github.com/onnx/onnx.git) registered for path 'thirdparty/onnx/onnx'
+Submodule 'thirdparty/protobuf' (https://github.com/protocolbuffers/protobuf.git) registered for path 'thirdparty/protobuf/protobuf'
+Submodule 'thirdparty/pugixml' (https://github.com/zeux/pugixml.git) registered for path 'thirdparty/pugixml'
+Submodule 'thirdparty/snappy' (https://github.com/google/snappy.git) registered for path 'thirdparty/snappy'
+Submodule 'thirdparty/telemetry' (https://github.com/openvinotoolkit/telemetry.git) registered for path 'thirdparty/telemetry'
+Submodule 'thirdparty/xbyak' (https://github.com/herumi/xbyak.git) registered for path 'thirdparty/xbyak'
+Submodule 'thirdparty/zlib/zlib' (https://github.com/madler/zlib.git) registered for path 'thirdparty/zlib/zlib'
+Cloning into '/home/abulg/openvino/cmake/developer_package/ncc_naming_style/ncc'...
+Cloning into '/home/abulg/openvino/src/bindings/python/thirdparty/pybind11'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_cpu/thirdparty/ComputeLibrary'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_cpu/thirdparty/kleidiai'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_cpu/thirdparty/libxsmm'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_cpu/thirdparty/mlas'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_cpu/thirdparty/onednn'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_cpu/thirdparty/xbyak_riscv'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_gpu/thirdparty/onednn_gpu'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_npu/thirdparty/level-zero-ext'...
+Cloning into '/home/abulg/openvino/src/plugins/intel_npu/thirdparty/yaml-cpp'...
+Cloning into '/home/abulg/openvino/thirdparty/flatbuffers/flatbuffers'...
+Cloning into '/home/abulg/openvino/thirdparty/gflags/gflags'...
+Cloning into '/home/abulg/openvino/thirdparty/gtest/gtest'...
+Cloning into '/home/abulg/openvino/thirdparty/ittapi/ittapi'...
+Cloning into '/home/abulg/openvino/thirdparty/json/nlohmann_json'...
+Cloning into '/home/abulg/openvino/thirdparty/level_zero/level-zero'...
+Cloning into '/home/abulg/openvino/thirdparty/ocl/cl_headers'...
+Cloning into '/home/abulg/openvino/thirdparty/ocl/clhpp_headers'...
+Cloning into '/home/abulg/openvino/thirdparty/ocl/icd_loader'...
+Cloning into '/home/abulg/openvino/thirdparty/onnx/onnx'...
+Cloning into '/home/abulg/openvino/thirdparty/protobuf/protobuf'...
+Cloning into '/home/abulg/openvino/thirdparty/pugixml'...
+Cloning into '/home/abulg/openvino/thirdparty/snappy'...
+Cloning into '/home/abulg/openvino/thirdparty/telemetry'...
+Cloning into '/home/abulg/openvino/thirdparty/xbyak'...
+Cloning into '/home/abulg/openvino/thirdparty/zlib/zlib'...
+Submodule path 'cmake/developer_package/ncc_naming_style/ncc': checked out '63e59ed312ba7a946779596e86124c1633f67607'
+Submodule path 'src/bindings/python/thirdparty/pybind11': checked out '45fab4087eaaff234227a10cf7845e8b07f28a98'
+Submodule path 'src/plugins/intel_cpu/thirdparty/ComputeLibrary': checked out 'cffb5d67ad74e6ed924c708d4981ba15b644bc05'
+Submodule path 'src/plugins/intel_cpu/thirdparty/kleidiai': checked out '7d82645ca2f3c3d58a5c0b1a96905e53916c8ff8'
+Submodule path 'src/plugins/intel_cpu/thirdparty/libxsmm': checked out '13df674c4b73a1b84f6456de8595903ebfbb43e0'
+Submodule path 'src/plugins/intel_cpu/thirdparty/mlas': checked out 'd1bc25ec4660cddd87804fcf03b2411b5dfb2e94'
+Submodule path 'src/plugins/intel_cpu/thirdparty/onednn': checked out '6b6492b1ea9ef5ca9ff3c5c59ed71dcca683a446'
+Submodule path 'src/plugins/intel_cpu/thirdparty/xbyak_riscv': checked out '07139a6df3942e4afa447c0885c50f3dacfab2f3'
+Submodule path 'src/plugins/intel_gpu/thirdparty/onednn_gpu': checked out '470e87eb07bdc805937a9f6d45d5c3a0fe4d27e7'
+Submodule path 'src/plugins/intel_npu/thirdparty/level-zero-ext': checked out '42768cc73e74f6d371bd9dd51b1860b07774e7ec'
+Submodule path 'src/plugins/intel_npu/thirdparty/yaml-cpp': checked out 'da82fd982c260e7f335ce5acbceff24b270544d1'
+Submodule path 'thirdparty/flatbuffers/flatbuffers': checked out '595bf0007ab1929570c7671f091313c8fc20644e'
+Submodule path 'thirdparty/gflags/gflags': checked out 'e171aa2d15ed9eb17054558e0b3a6a413bb01067'
+Submodule 'doc' (https://github.com/gflags/gflags.git) registered for path 'thirdparty/gflags/gflags/doc'
+Cloning into '/home/abulg/openvino/thirdparty/gflags/gflags/doc'...
+Submodule path 'thirdparty/gflags/gflags/doc': checked out '8411df715cf522606e3b1aca386ddfc0b63d34b4'
+Submodule path 'thirdparty/gtest/gtest': checked out '99760ac1776430f3df65947992bf4e8ebc0d7660'
+Submodule path 'thirdparty/ittapi/ittapi': checked out 'ca45fef1a12cef3316e6ff362a4d36571270e392'
+remote: Enumerating objects: 35034, done.
+remote: Counting objects: 100% (35033/35033), done.
+remote: Compressing objects: 100% (9387/9387), done.
+remote: Total 34581 (delta 22165), reused 34012 (delta 21604), pack-reused 0 (from 0)
+Receiving objects: 100% (34581/34581), 176.02 MiB | 745.00 KiB/s, done.
+Resolving deltas: 100% (22165/22165), completed with 316 local objects.
+From https://github.com/nlohmann/json
+ * branch              9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03 -> FETCH_HEAD
+Submodule path 'thirdparty/json/nlohmann_json': checked out '9cca280a4d0ccf0c08f47a99aa71d1b0e52f8d03'
+Submodule path 'thirdparty/level_zero/level-zero': checked out 'd562046e7266120e8be3533597b65f34a00524c1'
+Submodule path 'thirdparty/ocl/cl_headers': checked out '4ea6df132107e3b4b9407f903204b5522fdffcd6'
+Submodule path 'thirdparty/ocl/clhpp_headers': checked out 'c7b4aded1cab9560b226041dd962f63375a9a384'
+Submodule 'external/CMock' (https://github.com/ThrowTheSwitch/CMock) registered for path 'thirdparty/ocl/clhpp_headers/external/CMock'
+Cloning into '/home/abulg/openvino/thirdparty/ocl/clhpp_headers/external/CMock'...
+Submodule path 'thirdparty/ocl/clhpp_headers/external/CMock': checked out '379a9a8d5dd5cdff8fd345710dd70ae26f966c71'
+Submodule 'vendor/c_exception' (https://github.com/throwtheswitch/cexception.git) registered for path 'thirdparty/ocl/clhpp_headers/external/CMock/vendor/c_exception'
+Submodule 'vendor/unity' (https://github.com/throwtheswitch/unity.git) registered for path 'thirdparty/ocl/clhpp_headers/external/CMock/vendor/unity'
+Cloning into '/home/abulg/openvino/thirdparty/ocl/clhpp_headers/external/CMock/vendor/c_exception'...
+Cloning into '/home/abulg/openvino/thirdparty/ocl/clhpp_headers/external/CMock/vendor/unity'...
+Submodule path 'thirdparty/ocl/clhpp_headers/external/CMock/vendor/c_exception': checked out '71b47be7c950f1bf5f7e5303779fa99a16224bb6'
+Submodule path 'thirdparty/ocl/clhpp_headers/external/CMock/vendor/unity': checked out '4389bab82ee8a4b4631a03be2e07dd5c67dab2d4'
+Submodule path 'thirdparty/ocl/icd_loader': checked out '5907ac1114079de4383cecddf1c8640e3f52f92b'
+Submodule path 'thirdparty/onnx/onnx': checked out 'e709452ef2bbc1d113faf678c24e6d3467696e83'
+Submodule 'third_party/pybind11' (https://github.com/pybind/pybind11.git) registered for path 'thirdparty/onnx/onnx/third_party/pybind11'
+Cloning into '/home/abulg/openvino/thirdparty/onnx/onnx/third_party/pybind11'...
+Submodule path 'thirdparty/onnx/onnx/third_party/pybind11': checked out 'a2e59f0e7065404b44dfe92a28aca47ba1378dc4'
+Submodule path 'thirdparty/protobuf/protobuf': checked out 'f0dc78d7e6e331b8c6bb2d5283e06aa26883ca7c'
+Submodule 'third_party/benchmark' (https://github.com/google/benchmark.git) registered for path 'thirdparty/protobuf/protobuf/third_party/benchmark'
+Submodule 'third_party/googletest' (https://github.com/google/googletest.git) registered for path 'thirdparty/protobuf/protobuf/third_party/googletest'
+Cloning into '/home/abulg/openvino/thirdparty/protobuf/protobuf/third_party/benchmark'...
+Cloning into '/home/abulg/openvino/thirdparty/protobuf/protobuf/third_party/googletest'...
+Submodule path 'thirdparty/protobuf/protobuf/third_party/benchmark': checked out '5b7683f49e1e9223cf9927b24f6fd3d6bd82e3f8'
+Submodule path 'thirdparty/protobuf/protobuf/third_party/googletest': checked out '5ec7f0c4a113e2f18ac2c6cc7df51ad6afc24081'
+Submodule path 'thirdparty/pugixml': checked out 'ee86beb30e4973f5feffe3ce63bfa4fbadf72f38'
+Submodule path 'thirdparty/snappy': checked out '2c94e11145f0b7b184b831577c93e5a41c4c0346'
+Submodule 'third_party/benchmark' (https://github.com/google/benchmark.git) registered for path 'thirdparty/snappy/third_party/benchmark'
+Submodule 'third_party/googletest' (https://github.com/google/googletest.git) registered for path 'thirdparty/snappy/third_party/googletest'
+Cloning into '/home/abulg/openvino/thirdparty/snappy/third_party/benchmark'...
+Cloning into '/home/abulg/openvino/thirdparty/snappy/third_party/googletest'...
+Submodule path 'thirdparty/snappy/third_party/benchmark': checked out 'd572f4777349d43653b21d6c2fc63020ab326db2'
+Submodule path 'thirdparty/snappy/third_party/googletest': checked out 'b796f7d44681514f58a683a3a71ff17c94edb0c1'
+Submodule path 'thirdparty/telemetry': checked out '8abddc3dbc8beb04a39b5ea40cbba5020317102f'
+Submodule path 'thirdparty/xbyak': checked out '0d67fd1530016b7c56f3cd74b3fca920f4c3e2b4'
+Submodule path 'thirdparty/zlib/zlib': checked out '51b7f2abdade71cd9bb0e7a373ef2610ec6f9daf'
+
+
+
+abulg@HuaweiSx:~/openvino$ chmod +x install_build_dependencies.sh
+sudo ./install_build_dependencies.sh
+
+...
+
+After this operation, 1503 kB of additional disk space will be used.
+Get:1 http://archive.ubuntu.com/ubuntu noble/universe amd64 nlohmann-json3-dev all 3.11.3-1 [190 kB]
+Fetched 190 kB in 1s (216 kB/s)
+Selecting previously unselected package nlohmann-json3-dev.
+(Reading database ... 72281 files and directories currently installed.)
+Preparing to unpack .../nlohmann-json3-dev_3.11.3-1_all.deb ...
+Unpacking nlohmann-json3-dev (3.11.3-1) ...
+Setting up nlohmann-json3-dev (3.11.3-1) ...
+
+
+
+abulg@HuaweiSx:~/openvino/build$ cmake -DCMAKE_BUILD_TYPE=Release       -DENABLE_SYSTEM_TBB=ON       -DENABLE_INTEL_NPU=OFF       ..
+-- The C compiler identification is GNU 13.3.0
+-- The CXX compiler identification is GNU 13.3.0
+^[[A-- Detecting C compiler ABI info
+^[[A-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+^[[A-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test OPENVINO_STDLIB_GNU
+-- Performing Test OPENVINO_STDLIB_GNU - Success
+-- Performing Test OPENVINO_GLIBC_MUSL
+-- Performing Test OPENVINO_GLIBC_MUSL - Failed
+-- OpenVINO version is 2026.2.0 (Build 21571)
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test SUGGEST_OVERRIDE_SUPPORTED
+-- Performing Test SUGGEST_OVERRIDE_SUPPORTED - Success
+-- Performing Test UNUSED_BUT_SET_VARIABLE_SUPPORTED
+-- Performing Test UNUSED_BUT_SET_VARIABLE_SUPPORTED - Success
+-- Found clang-format: CLANG_FORMAT-NOTFOUND
+CMake Warning at cmake/developer_package/clang_format/clang_format.cmake:23 (message):
+  Supported clang-format-18 is not found!
+Call Stack (most recent call first):
+  cmake/developer_package/OpenVINODeveloperScriptsConfig.cmake:316 (include)
+  CMakeLists.txt:44 (find_package)
+
+
+^[[ACMake Warning at cmake/developer_package/ncc_naming_style/ncc_naming_style.cmake:91 (message):
+  clang-15 libclang-15-dev are not found (required for ncc naming style
+  check)
+Call Stack (most recent call first):
+  cmake/developer_package/OpenVINODeveloperScriptsConfig.cmake:318 (include)
+  CMakeLists.txt:44 (find_package)
+
+
+-- OpenVINO Runtime enabled features:
+--
+--     CI_BUILD_NUMBER: 2026.2.0-21571-9c4a2eb9ad3
+--     ENABLE_LTO = OFF
+--     OS_FOLDER = OFF
+--     USE_BUILD_TYPE_SUBFOLDER = ON
+--     CMAKE_COMPILE_WARNING_AS_ERROR = OFF
+--     ENABLE_QSPECTRE = OFF
+--     ENABLE_INTEGRITYCHECK = OFF
+--     ENABLE_SANITIZER = OFF
+--     ENABLE_UB_SANITIZER = OFF
+--     ENABLE_THREAD_SANITIZER = OFF
+--     ENABLE_COVERAGE = OFF
+--     ENABLE_API_VALIDATOR = OFF
+--     ENABLE_PDB_IN_RELEASE = OFF
+--     ENABLE_SSE42 = ON
+--     ENABLE_AVX2 = ON
+--     ENABLE_AVX512F = ON
+--     ENABLE_NEON_FP16 = OFF
+--     ENABLE_SVE = OFF
+--     BUILD_SHARED_LIBS = ON
+--     ENABLE_LIBRARY_VERSIONING = ON
+--     ENABLE_FASTER_BUILD = OFF
+--     ENABLE_CLANG_FORMAT = OFF
+--     ENABLE_CLANG_TIDY = OFF
+--     ENABLE_CLANG_TIDY_FIX = OFF
+--     ENABLE_NCC_STYLE = OFF
+--     ENABLE_UNSAFE_LOCATIONS = OFF
+--     ENABLE_FUZZING = OFF
+--     ENABLE_PROXY = ON
+--     ENABLE_INTEL_CPU = ON
+--     ENABLE_ARM_COMPUTE_CMAKE = OFF
+--     ENABLE_TESTS = OFF
+--     ENABLE_INTEL_GPU = ON
+--     GPU_RT_TYPE = OCL
+--     ENABLE_ONEDNN_FOR_GPU = ON
+--     ENABLE_INTEL_NPU = OFF
+--     ENABLE_INTEL_NPU_INTERNAL = OFF
+--     ENABLE_DEBUG_CAPS = OFF
+--     ENABLE_NPU_DEBUG_CAPS = OFF
+--     ENABLE_GPU_DEBUG_CAPS = OFF
+--     ENABLE_CPU_DEBUG_CAPS = OFF
+--     ENABLE_SNIPPETS_DEBUG_CAPS = OFF
+--     ENABLE_SNIPPETS_LIBXSMM_TPP = OFF
+--     ENABLE_PROFILING_ITT = BASE
+--     ENABLE_PROFILING_FILTER = ALL
+--     ENABLE_PROFILING_FIRST_INFERENCE = ON
+--     SELECTIVE_BUILD = OFF
+--     ENABLE_DOCS = OFF
+--     ENABLE_PKGCONFIG_GEN = ON
+--     THREADING = TBB_ADAPTIVE
+--     ENABLE_INTEL_OPENMP = OFF
+--     ENABLE_TBBBIND_2_5 = ON
+--     ENABLE_MULTI = ON
+--     ENABLE_AUTO = ON
+--     ENABLE_AUTO_BATCH = ON
+--     ENABLE_HETERO = ON
+--     ENABLE_TEMPLATE = ON
+--     ENABLE_PLUGINS_XML = OFF
+--     ENABLE_FUNCTIONAL_TESTS = OFF
+--     ENABLE_SAMPLES = ON
+--     ENABLE_GIL_PYTHON_API = ON
+--     ENABLE_OV_ONNX_FRONTEND = ON
+--     ENABLE_OV_PADDLE_FRONTEND = ON
+--     ENABLE_OV_IR_FRONTEND = ON
+--     ENABLE_OV_PYTORCH_FRONTEND = ON
+--     ENABLE_OV_JAX_FRONTEND = ON
+--     ENABLE_OV_TF_FRONTEND = ON
+--     ENABLE_OV_TF_LITE_FRONTEND = ON
+--     ENABLE_SNAPPY_COMPRESSION = ON
+--     ENABLE_STRICT_DEPENDENCIES = OFF
+--     ENABLE_SYSTEM_TBB = ON
+--     ENABLE_SYSTEM_PUGIXML = OFF
+--     ENABLE_SYSTEM_FLATBUFFERS = ON
+--     ENABLE_SYSTEM_OPENCL = ON
+--     ENABLE_SYSTEM_PROTOBUF = OFF
+--     ENABLE_SYSTEM_SNAPPY = OFF
+--     ENABLE_SYSTEM_LEVEL_ZERO = OFF
+--     ENABLE_JS = ON
+--     ENABLE_OPENVINO_DEBUG = OFF
+--
+-- CMAKE_VERSION ......................... 3.28.3
+-- CMAKE_CROSSCOMPILING .................. FALSE
+-- OpenVINO_SOURCE_DIR ................... /home/abulg/openvino
+-- OpenVINO_BINARY_DIR ................... /home/abulg/openvino/build
+-- CMAKE_GENERATOR ....................... Unix Makefiles
+-- CPACK_GENERATOR ....................... TGZ
+-- CMAKE_C_COMPILER_ID ................... GNU
+-- CMAKE_CXX_COMPILER_ID ................. GNU
+-- CMAKE_CXX_STANDARD .................... 17
+-- CMAKE_BUILD_TYPE ...................... Release
+-- LIBC_VERSION .......................... 2.39
+-- STDLIB ................................ GNU
+-- Looking for C++ include unistd.h
+-- Looking for C++ include unistd.h - found
+-- Looking for C++ include stdint.h
+-- Looking for C++ include stdint.h - found
+-- Looking for C++ include sys/types.h
+-- Looking for C++ include sys/types.h - found
+-- Looking for C++ include fnmatch.h
+-- Looking for C++ include fnmatch.h - found
+-- Looking for strtoll
+-- Looking for strtoll - found
+-- Protocol Buffers Configuring...
+--
+-- 3.21.12.0
+-- Configuration script parsing status [
+--   Description : Protocol Buffers
+--   Version     : 3.21.12.0 (3.21.12)
+--   Contact     : protobuf@googlegroups.com
+-- ]
+-- Performing Test protobuf_HAVE_LD_VERSION_SCRIPT
+-- Performing Test protobuf_HAVE_LD_VERSION_SCRIPT - Success
+-- Performing Test protobuf_HAVE_BUILTIN_ATOMICS
+-- Performing Test protobuf_HAVE_BUILTIN_ATOMICS - Success
+-- Protocol Buffers Configuring done
+-- Looking for sys/mman.h
+-- Looking for sys/mman.h - found
+-- Looking for sys/resource.h
+-- Looking for sys/resource.h - found
+-- Looking for sys/time.h
+-- Looking for sys/time.h - found
+-- Looking for sys/uio.h
+-- Looking for sys/uio.h - found
+-- Looking for windows.h
+-- Looking for windows.h - not found
+-- Looking for zlibVersion in z
+-- Looking for zlibVersion in z - found
+-- Looking for lzo1x_1_15_compress in lzo2
+-- Looking for lzo1x_1_15_compress in lzo2 - not found
+-- Looking for LZ4_compress_default in lz4
+-- Looking for LZ4_compress_default in lz4 - not found
+-- Performing Test HAVE_VISUAL_STUDIO_ARCH_AVX
+-- Performing Test HAVE_VISUAL_STUDIO_ARCH_AVX - Failed
+-- Performing Test HAVE_VISUAL_STUDIO_ARCH_AVX2
+-- Performing Test HAVE_VISUAL_STUDIO_ARCH_AVX2 - Failed
+-- Performing Test HAVE_CLANG_MAVX
+-- Performing Test HAVE_CLANG_MAVX - Success
+-- Performing Test HAVE_CLANG_MBMI2
+-- Performing Test HAVE_CLANG_MBMI2 - Success
+-- Performing Test SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS
+-- Performing Test SNAPPY_HAVE_NO_MISSING_FIELD_INITIALIZERS - Success
+-- Performing Test SNAPPY_HAVE_NO_IMPLICIT_INT_FLOAT_CONVERSION
+-- Performing Test SNAPPY_HAVE_NO_IMPLICIT_INT_FLOAT_CONVERSION - Success
+-- Performing Test HAVE_BUILTIN_EXPECT
+-- Performing Test HAVE_BUILTIN_EXPECT - Success
+-- Performing Test HAVE_BUILTIN_CTZ
+-- Performing Test HAVE_BUILTIN_CTZ - Success
+-- Performing Test HAVE_BUILTIN_PREFETCH
+-- Performing Test HAVE_BUILTIN_PREFETCH - Success
+-- Performing Test HAVE_ATTRIBUTE_ALWAYS_INLINE
+-- Performing Test HAVE_ATTRIBUTE_ALWAYS_INLINE - Success
+-- Performing Test SNAPPY_HAVE_SSSE3
+-- Performing Test SNAPPY_HAVE_SSSE3 - Failed
+-- Performing Test SNAPPY_HAVE_X86_CRC32
+-- Performing Test SNAPPY_HAVE_X86_CRC32 - Failed
+-- Performing Test SNAPPY_HAVE_NEON_CRC32
+-- Performing Test SNAPPY_HAVE_NEON_CRC32 - Failed
+-- Performing Test SNAPPY_HAVE_BMI2
+-- Performing Test SNAPPY_HAVE_BMI2 - Failed
+-- Performing Test SNAPPY_HAVE_NEON
+-- Performing Test SNAPPY_HAVE_NEON - Failed
+-- Looking for mmap
+-- Looking for mmap - found
+-- Looking for sysconf
+-- Looking for sysconf - found
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter
+-- ONNX_PROTOC_EXECUTABLE: $<TARGET_FILE:protobuf::protoc>
+-- Protobuf_VERSION:
+Generated: /home/abulg/openvino/build/thirdparty/onnx/onnx/onnx/onnx_openvino_onnx-ml.proto
+Generated: /home/abulg/openvino/build/thirdparty/onnx/onnx/onnx/onnx-operators_openvino_onnx-ml.proto
+Generated: /home/abulg/openvino/build/thirdparty/onnx/onnx/onnx/onnx-data_openvino_onnx.proto
+--
+-- ******** Summary ********
+--   CMake version                     : 3.28.3
+--   CMake command                     : /usr/bin/cmake
+--   System                            : Linux
+--   C++ compiler                      : /usr/bin/c++
+--   C++ compiler version              : 13.3.0
+--   CXX flags                         : -Wsuggest-override  -fsigned-char -ffunction-sections -fdata-sections -fdiagnostics-show-option -Wall -Wundef -Wno-suggest-override -Wnon-virtual-dtor
+--   Build type                        : Release
+--   Compile definitions               : OV_BUILD_POSTFIX="";OV_NATIVE_PARENT_PROJECT_ROOT_DIR="openvino"
+--   CMAKE_PREFIX_PATH                 :
+--   CMAKE_INSTALL_PREFIX              : /usr/local
+--   CMAKE_MODULE_PATH                 :
+--
+--   ONNX version                      : 1.18.0
+--   ONNX NAMESPACE                    : openvino_onnx
+--   ONNX_USE_LITE_PROTO               : ON
+--   USE_PROTOBUF_SHARED_LIBS          : OFF
+--   ONNX_DISABLE_EXCEPTIONS           : OFF
+--   ONNX_DISABLE_STATIC_REGISTRATION  : OFF
+--   ONNX_WERROR                       : OFF
+--   ONNX_BUILD_TESTS                  : OFF
+--   BUILD_SHARED_LIBS                 : OFF
+--
+--   Protobuf compiler                 : $<TARGET_FILE:protobuf::protoc>
+--   Protobuf includes                 :
+--   Protobuf libraries                :
+--   ONNX_BUILD_PYTHON                 : OFF
+-- TBB (2021.11.0) is found at /usr/lib/x86_64-linux-gnu/cmake/TBB
+-- Static tbbbind_2_5 package usage is disabled, since oneTBB (ver. 2021.11.0) provides dynamic TBBBind 2.5+
+-- The ASM compiler identification is GNU
+-- Found assembler: /usr/bin/cc
+-- The ASM_MASM compiler identification is unknown
+-- Found assembler: ml
+-- DNNL_TARGET_ARCH: X64
+-- DNNL_LIBRARY_NAME: openvino_onednn_cpu
+-- Found OpenMP_C: -fopenmp (found version "4.5")
+-- Found OpenMP_CXX: -fopenmp (found version "4.5")
+-- Found OpenMP: TRUE (found version "4.5")
+-- Threadpool testing: standalone
+-- Found Git: /usr/bin/git (found version "2.43.0")
+-- Enabled testing coverage: CI
+-- Enabled workload: INFERENCE
+-- Enabled primitives: CONVOLUTION;DECONVOLUTION;CONCAT;LRN;INNER_PRODUCT;MATMUL;POOLING;REDUCTION;REORDER;RNN;SOFTMAX
+-- Enabled primitive CPU ISA: ALL
+-- Enabled primitive GPU ISA: ALL
+-- Enabled GeMM kernels ISA: SSE41
+-- Primitive cache is enabled
+-- RapidJSON found. Headers: /usr/include
+-- Python3 executable: /usr/bin/python3
+-- Python3 version: 3.12.3
+-- Python3 interpreter ID: Python
+-- Python3 SOABI: cpython-312-x86_64-linux-gnu
+-- Python3 include dirs: /usr/include/python3.12
+-- Python3 libraries:
+CMake Warning at cmake/developer_package/python_requirements.cmake:118 (message):
+  Python requirement file
+  /home/abulg/openvino/src/bindings/python/wheel/requirements-dev.txt is not
+  installed,
+Call Stack (most recent call first):
+  src/bindings/python/CMakeLists.txt:148 (ov_check_pip_packages)
+
+
+-- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter Development.Module
+-- pybind11 v3.0.2
+-- Performing Test HAS_FLTO_AUTO
+-- Performing Test HAS_FLTO_AUTO - Success
+CMake Warning at samples/cpp/common/format_reader/CMakeLists.txt:22 (message):
+  OpenCV ver.  3.0+ is not found, format_reader will be built without OpenCV
+  support
+
+
+CMake Warning at samples/cpp/benchmark_app/CMakeLists.txt:112 (message):
+  OpenCV ver.  3.0+ is not found, benchmark_app will be built without OpenCV
+  support.  Set OpenCV_DIR
+
+
+CMake Warning at samples/c/common/opencv_c_wrapper/CMakeLists.txt:20 (message):
+  OpenCV ver.  3.0+ is not found, opencv_c_wrapper is built without OPENCV
+  support
+
+
+-- Register template to be built in build-modules/template
+-- Register template_extension to be built in build-modules/template_extension
+-- /usr/bin/pkg-config: libva (1.20.0) is found at /usr
+-- Configuring done (30.2s)
+-- Generating done (0.6s)
+-- Build files have been written to: /home/abulg/openvino/build
+abulg@HuaweiSx:~/openvino/build$ cmake --build . --parallel 2
+[  0%] Generate ov_plugins.hpp
+[  0%] Building CXX object thirdparty/pugixml/CMakeFiles/pugixml-static.dir/src/pugixml.cpp.o
+[  0%] Built target _ov_plugins_hpp
+[  0%] Building C object thirdparty/ittapi/ittapi/CMakeFiles/ittnotify.dir/src/ittnotify/ittnotify_static.c.o
+
+
+
+…
+
+
+[100%] Building CXX object src/plugins/intel_gpu/CMakeFiles/openvino_intel_gpu_plugin.dir/src/plugin/transformations_pipeline.cpp.o
+[100%] Building CXX object src/plugins/intel_gpu/CMakeFiles/openvino_intel_gpu_plugin.dir/src/plugin/usm_host_tensor.cpp.o
+[100%] Building CXX object src/plugins/intel_gpu/CMakeFiles/openvino_intel_gpu_plugin.dir/src/plugin/variable_state.cpp.o
+[100%] Linking CXX shared module /home/abulg/openvino/bin/intel64/Release/libopenvino_intel_gpu_plugin.so
+[100%] Built target openvino_intel_gpu_plugin
+
+
+abulg@HuaweiSx:~/openvino/build$ cd ~
+git clone https://github.com/Hmm466/OpenVINO-Java-API.git
+cd OpenVINO-Java-API
+Cloning into 'OpenVINO-Java-API'...
+remote: Enumerating objects: 408, done.
+remote: Counting objects: 100% (53/53), done.
+remote: Compressing objects: 100% (29/29), done.
+remote: Total 408 (delta 13), reused 40 (delta 8), pack-reused 355 (from 1)
+Receiving objects: 100% (408/408), 96.83 MiB | 834.00 KiB/s, done.
+Resolving deltas: 100% (143/143), done.
+abulg@HuaweiSx:~/OpenVINO-Java-API$ mvn clean install
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for org.openvino:java-api:jar:1.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 29, column 22
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 35, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.projectlombok:lombok:jar -> duplicate declaration of version RELEASE @ line 32, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] -----------------------< org.openvino:java-api >------------------------
+[INFO] Building java-api 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.4/maven-install-plugin-2.4.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.4/maven-install-plugin-2.4.pom (6.4 kB at 6.8 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.4/maven-install-plugin-2.4.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-install-plugin/2.4/maven-install-plugin-2.4.jar (27 kB at 162 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/projectlombok/lombok/maven-metadata.xml
+Downloaded from central: https://repo.maven.apache.org/maven2/org/projectlombok/lombok/maven-metadata.xml (2.2 kB at 6.8 kB/s)
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ java-api ---
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ java-api ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/abulg/OpenVINO-Java-API/src/main/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ java-api ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 47 source files to /home/abulg/OpenVINO-Java-API/target/classes
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java uses or overrides a deprecated API.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java uses unchecked or unsafe operations.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: Recompile with -Xlint:unchecked for details.
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ java-api ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/abulg/OpenVINO-Java-API/src/test/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ java-api ---
+[INFO] No sources to compile
+[INFO]
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ java-api ---
+[INFO] No tests to run.
+[INFO]
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ java-api ---
+[INFO] Building jar: /home/abulg/OpenVINO-Java-API/target/java-api-1.0-SNAPSHOT.jar
+[INFO]
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ java-api ---
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0.5/plexus-utils-3.0.5.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0.5/plexus-utils-3.0.5.pom (2.5 kB at 16 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/3.1/plexus-3.1.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/3.1/plexus-3.1.pom (19 kB at 131 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.pom (1.1 kB at 7.3 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.7/plexus-components-1.1.7.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-components/1.1.7/plexus-components-1.1.7.pom (5.0 kB at 34 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.8/plexus-1.0.8.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus/1.0.8/plexus-1.0.8.pom (7.2 kB at 45 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-8/plexus-container-default-1.0-alpha-8.pom
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-container-default/1.0-alpha-8/plexus-container-default-1.0-alpha-8.pom (7.3 kB at 53 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.jar
+Downloading from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0.5/plexus-utils-3.0.5.jar
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-digest/1.0/plexus-digest-1.0.jar (12 kB at 39 kB/s)
+Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexus/plexus-utils/3.0.5/plexus-utils-3.0.5.jar (230 kB at 649 kB/s)
+[INFO] Installing /home/abulg/OpenVINO-Java-API/target/java-api-1.0-SNAPSHOT.jar to /home/abulg/.m2/repository/org/openvino/java-api/1.0-SNAPSHOT/java-api-1.0-SNAPSHOT.jar
+[INFO] Installing /home/abulg/OpenVINO-Java-API/pom.xml to /home/abulg/.m2/repository/org/openvino/java-api/1.0-SNAPSHOT/java-api-1.0-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  5.999 s
+[INFO] Finished at: 2026-04-11T21:02:48+03:00
+[INFO] ------------------------------------------------------------------------
+
+
+
+abulg@HuaweiSx:~/Downloads$ # Библиотеки из твоей сборки
+sudo cp ~/openvino/bin/intel64/Release/*.so /usr/lib/
+[sudo] password for abulg:
+abulg@HuaweiSx:~/Downloads$ ls /usr/lib/libopenvino*
+/usr/lib/libopenvino.so                    /usr/lib/libopenvino_jax_frontend.so
+/usr/lib/libopenvino_auto_batch_plugin.so  /usr/lib/libopenvino_onnx_frontend.so
+/usr/lib/libopenvino_auto_plugin.so        /usr/lib/libopenvino_paddle_frontend.so
+/usr/lib/libopenvino_c.so                  /usr/lib/libopenvino_pytorch_frontend.so
+/usr/lib/libopenvino_c.so.2600             /usr/lib/libopenvino_template_extension.so
+/usr/lib/libopenvino_hetero_plugin.so      /usr/lib/libopenvino_template_plugin.so
+/usr/lib/libopenvino_intel_cpu_plugin.so   /usr/lib/libopenvino_tensorflow_frontend.so
+/usr/lib/libopenvino_intel_gpu_plugin.so   /usr/lib/libopenvino_tensorflow_lite_frontend.so
+/usr/lib/libopenvino_ir_frontend.so
+abulg@HuaweiSx:~/Downloads$ cd ~/OpenVINO-Java-API
+abulg@HuaweiSx:~/OpenVINO-Java-API$ mvn clean install
+
+
+
+
+//ТЕСТ ИЗ OPENVINO-JAVA-API hmm466
+abulg@HuaweiSx:~/OpenVINO-Java-API$ cd ~/OpenVINO-Java-API
+
+# Создай тестовый класс (как в README, только без модели пока)
+cat > src/main/java/OpenVINOTest.java << 'EOF'
+import org.openvino.java.OpenVINO;
+import org.openvino.java.core.Core;
+import org.openvino.java.core.Model;
+import org.openvino.java.core.CompiledModel;
+import org.openvino.java.core.InferRequest;
+import org.openvino.java.core.Tensor;
+
+public class OpenVINOTest {
+    public static void main(String[] args) {
+        try {
+            // Загружаем OpenVINO (ищет в /usr/lib)
+            OpenVINO.load();
+            System.out.println("✅ OpenVINO загружен");
+
+            Core core = new Core();
+            System.out.println("✅ Core создан");
+
+            // Просто проверяем, что API работает
+            System.out.println("API работает корректно");
+
+            core.free();
+            System.out.println("✅ Тест пройден!");
+
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка: " + e.getMessage());
+            e.printStackTrace();
+mvn clean compile exec:java -Dexec.mainClass="OpenVINOTest"
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for org.openvino:java-api:jar:1.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 29, column 22
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 35, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.projectlombok:lombok:jar -> duplicate declaration of version RELEASE @ line 32, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] -----------------------< org.openvino:java-api >------------------------
+[INFO] Building java-api 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ java-api ---
+[INFO] Deleting /home/abulg/OpenVINO-Java-API/target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ java-api ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/abulg/OpenVINO-Java-API/src/main/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ java-api ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 48 source files to /home/abulg/OpenVINO-Java-API/target/classes
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java uses or overrides a deprecated API.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java uses unchecked or unsafe operations.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: Recompile with -Xlint:unchecked for details.
+[INFO]
+[INFO] --- exec-maven-plugin:3.6.3:java (default-cli) @ java-api ---
+✅ OpenVINO загружен
+✅ Core создан
+API работает корректно
+✅ Тест пройден!
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.723 s
+[INFO] Finished at: 2026-04-11T21:47:34+03:00
+[INFO] ------------------------------------------------------------------------
+
+
+
+
+//ЗАПУСК НЕ МАВНОМ (ПРИМЕР ИЗ README OPENVINO-JAVA-API hmm466)
+abulg@HuaweiSx:~/OpenVINO-Java-API$ mvn clean package -DskipTests
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for org.openvino:java-api:jar:1.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 29, column 22
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 35, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.projectlombok:lombok:jar -> duplicate declaration of version RELEASE @ line 32, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] -----------------------< org.openvino:java-api >------------------------
+[INFO] Building java-api 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ java-api ---
+[INFO] Deleting /home/abulg/OpenVINO-Java-API/target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ java-api ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/abulg/OpenVINO-Java-API/src/main/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ java-api ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 47 source files to /home/abulg/OpenVINO-Java-API/target/classes
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java uses or overrides a deprecated API.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java uses unchecked or unsafe operations.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: Recompile with -Xlint:unchecked for details.
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ java-api ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/abulg/OpenVINO-Java-API/src/test/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ java-api ---
+[INFO] No sources to compile
+[INFO]
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ java-api ---
+[INFO] Tests are skipped.
+[INFO]
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ java-api ---
+[INFO] Building jar: /home/abulg/OpenVINO-Java-API/target/java-api-1.0-SNAPSHOT.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.645 s
+[INFO] Finished at: 2026-04-11T21:59:22+03:00
+[INFO] ------------------------------------------------------------------------
+abulg@HuaweiSx:~/OpenVINO-Java-API$ ls -la target/java-api-1.0-SNAPSHOT.jar
+-rw-r--r-- 1 abulg abulg 59101 Apr 11 21:59 target/java-api-1.0-SNAPSHOT.jar
+abulg@HuaweiSx:~/OpenVINO-Java-API$ wget -nc https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar
+--2026-04-11 21:59:36--  https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar
+Resolving repo1.maven.org (repo1.maven.org)... 104.18.18.12, 104.18.19.12, 2606:4700::6812:120c, ...
+Connecting to repo1.maven.org (repo1.maven.org)|104.18.18.12|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 1879325 (1.8M) [application/java-archive]
+Saving to: ‘jna-5.13.0.jar’
+
+jna-5.13.0.jar                100%[=================================================>]   1.79M  2.76MB/s    in 0.6s
+
+2026-04-11 21:59:37 (2.76 MB/s) - ‘jna-5.13.0.jar’ saved [1879325/1879325]
+
+abulg@HuaweiSx:~/OpenVINO-Java-API$ cat > OpenVINOTest.java << 'EOF'
+import org.openvino.java.OpenVINO;
+import org.openvino.java.core.Core;
+
+public class OpenVINOTest {
+    public static void main(String[] args) {
+        try {
+            OpenVINO.load();
+            System.out.println("✅ OpenVINO загружен");
+
+            Core core = new Core();
+            System.out.println("✅ Core создан");
+
+            core.free();
+            System.out.println("✅ Тест пройден!");
+
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+EOF
+abulg@HuaweiSx:~/OpenVINO-Java-API$ javac -cp ".:target/java-api-1.0-SNAPSHOT.jar:jna-5.13.0.jar" OpenVINOTest.java
+abulg@HuaweiSx:~/OpenVINO-Java-API$ java -cp ".:target/java-api-1.0-SNAPSHOT.jar:jna-5.13.0.jar" OpenVINOTest
+✅ OpenVINO загружен
+✅ Core создан
+✅ Тест пройден!
+
+
+
+
+//ПРИМЕР КОДА КОТОРЫЙ Я КИДАЛ В РЕКВЕСТ ПАДАЕТ С ТОЙ ЖЕ ОШИБКОЙ
+abulg@HuaweiSx:~/OpenVINO-Java-API$ cd ~/OpenVINO-Java-API
+
+# Твой точный код
+cat > ResNetDetection.java << 'EOF'
+import org.openvino.java.OpenVINO;
+import org.openvino.java.core.Core;
+import org.openvino.java.core.Model;
+import org.openvino.java.core.CompiledModel;
+import org.openvino.java.core.InferRequest;
+import org.openvino.java.core.Tensor;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+import java.util.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.Graphics2D;
+import javax.imageio.ImageIO;
+import java.io.*;
+
+public class ResNetDetection {
+
+    private static Core core;
+    private static CompiledModel model;
+    private static String inputName;
+    private static String outputName;
+
+    static {
+        OpenVINO.load();
+        System.out.println("✅ OpenVINO загружен");
+    }
+
+    public static void main(String[] args) {
+        try {
+            System.out.println("\n=== ЗАГРУЗКА RESNET МОДЕЛИ ===");
+            core = new Core();
+
+            Model ovModel = core.readModel("/home/abulg/resnet_detection_objects/resnet50-v2-7.xml");
+            System.out.println("✅ Модель загружена");
+
+            // Получаем имена
+            inputName = ((org.openvino.java.core.Input) ovModel.inputs().get(0)).getAnyName();
+            outputName = ((org.openvino.java.core.Output) ovModel.outputs().get(0)).getAnyName();
+            System.out.println("  Вход: " + inputName);
+            System.out.println("  Выход: " + outputName);
+
+            model = core.compileModel(ovModel, "CPU");
+java -cp ".:target/java-api-1.0-SNAPSHOT.jar:jna-5.13.0.jar" ResNetDetectionn.javaData"););[indices[i]]);
+✅ OpenVINO загружен
+
+=== ЗАГРУЗКА RESNET МОДЕЛИ ===
+✅ Модель загружена
+  Вход: data
+  Выход: resnetv24_dense0_fwd
+✅ Модель скомпилирована для CPU
+
+=== ПОДГОТОВКА ДАННЫХ ===
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x0000709535cabf15, pid=42839, tid=42840
+#
+# JRE version: OpenJDK Runtime Environment (17.0.18+8) (build 17.0.18+8-Ubuntu-124.04.1)
+# Java VM: OpenJDK 64-Bit Server VM (17.0.18+8-Ubuntu-124.04.1, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, linux-amd64)
+# Problematic frame:
+# V  [libjvm.so+0xaabf15]malloc(): corrupted top size
+Aborted (core dumped)
+
+
+
+
+//ЗАПУСК ПРЕДЫДУЩЕГО КОДА МАВНОМ
+cat > src/main/java/ResNetDetection.java << 'EOF'
+import org.openvino.java.OpenVINO;
+import org.openvino.java.core.Core;
+import org.openvino.java.core.Model;
+import org.openvino.java.core.CompiledModel;
+import org.openvino.java.core.InferRequest;
+import org.openvino.java.core.Tensor;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+import java.util.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.Graphics2D;
+
+public class ResNetDetection {
+
+    private static Core core;
+    private static CompiledModel model;
+    private static String inputName;
+    private static String outputName;
+
+    static {
+        OpenVINO.load();
+mvn exec:java -Dexec.mainClass="ResNetDetection";00];bj).getValue();redMethod("getData"););[indices[i]]);
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for org.openvino:java-api:jar:1.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 29, column 22
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 35, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.projectlombok:lombok:jar -> duplicate declaration of version RELEASE @ line 32, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] -----------------------< org.openvino:java-api >------------------------
+[INFO] Building java-api 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ java-api ---
+[INFO] Deleting /home/abulg/OpenVINO-Java-API/target
+[INFO]
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ java-api ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] skip non existing resourceDirectory /home/abulg/OpenVINO-Java-API/src/main/resources
+[INFO]
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ java-api ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 48 source files to /home/abulg/OpenVINO-Java-API/target/classes
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java uses or overrides a deprecated API.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/VINO.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java uses unchecked or unsafe operations.
+[WARNING] /home/abulg/OpenVINO-Java-API/src/main/java/org/openvino/java/core/Tensor.java: Recompile with -Xlint:unchecked for details.
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  2.665 s
+[INFO] Finished at: 2026-04-11T22:11:56+03:00
+[INFO] ------------------------------------------------------------------------
+[INFO] Scanning for projects...
+[WARNING]
+[WARNING] Some problems were encountered while building the effective model for org.openvino:java-api:jar:1.0-SNAPSHOT
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 29, column 22
+[WARNING] 'dependencies.dependency.version' for org.projectlombok:lombok:jar is either LATEST or RELEASE (both of them are being deprecated) @ line 35, column 22
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: org.projectlombok:lombok:jar -> duplicate declaration of version RELEASE @ line 32, column 21
+[WARNING]
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING]
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING]
+[INFO]
+[INFO] -----------------------< org.openvino:java-api >------------------------
+[INFO] Building java-api 1.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] --- exec-maven-plugin:3.6.3:java (default-cli) @ java-api ---
+✅ OpenVINO загружен
+
+=== ЗАГРУЗКА RESNET МОДЕЛИ ===
+✅ Модель загружена
+  Вход: data
+  Выход: resnetv24_dense0_fwd
+✅ Модель скомпилирована для CPU
+
+=== ПОДГОТОВКА ДАННЫХ ===
+✅ Данные установлены, размер: 150528
+
+=== ИНФЕРЕНС ===
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007700f5e8683d, pid=43002, tid=43056
+#
+# JRE version: OpenJDK Runtime Environment (17.0.18+8) (build 17.0.18+8-Ubuntu-124.04.1)
+# Java VM: OpenJDK 64-Bit Server VM (17.0.18+8-Ubuntu-124.04.1, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libopenvino.so.2620+0xa8683d]  ov::ISyncInferRequest::find_port(ov::Output<ov::Node const> const&) const+0x12d
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/wsl-capture-crash %t %E %p %s" (or dumping to /home/abulg/OpenVINO-Java-API/core.43002)
+#
+# An error report file with more information is saved as:
+# /home/abulg/OpenVINO-Java-API/hs_err_pid43002.log
+double free or corruption (out)
+Aborted (core dumped)
+abulg@HuaweiSx:~/OpenVINO-Java-API$

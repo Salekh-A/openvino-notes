@@ -1,0 +1,326 @@
+cat > Phi2Summary.java << 'EOF'
+import org.openvino.java.OpenVINO;
+import org.openvino.java.core.Core;
+import org.openvino.java.core.Model;
+import org.openvino.java.core.CompiledModel;
+import org.openvino.java.core.InferRequest;
+import org.openvino.java.core.Tensor;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+import java.util.*;
+
+public class Phi2Summary {
+    
+    public static void main(String[] args) {
+        try {
+            OpenVINO.load();
+            System.out.println("✅ OpenVINO загружен");
+            
+            String text = args.length > 0 ? String.join(" ", args) : 
+                "Жили-были старик со старухой. Испекла старуха колобок и положила на окошко. " +
+                "Колобок полежал, полежал, да и покатился: с окна на лавку, с лавки на пол, " +
+                "по полу к двери, прыг через порог — да в сени, из сеней на крыльцо, с крыльца на двор, " +
+                "со двора за ворота, дальше и дальше.";
+            
+            System.out.println("\n=== PHI-2 ПЕРЕСКАЗ ТЕКСТА ===");
+            System.out.println("📝 Оригинал:\n" + text);
+            
+            // Формируем промпт для пересказа
+            String prompt = "Кратко перескажи текст:\n\n" + text + "\n\nПересказ:";
+            System.out.println("\n🔄 Генерация пересказа...");
+            
+            Core core = new Core();
+            String modelPath = "/home/abulg/.cache/huggingface/hub/models--OpenVINO--phi-2-int4-ov/snapshots/2e4aca08e4a1180e0891015da9cb918d10bfb31f/openvino_model.xml";
+            Model model = core.readModel(modelPath);
+            CompiledModel compiled = core.compileModel(model, "CPU");
+            
+            // Токенизация промпта
+            List<Integer> tokens = new ArrayList<>();
+            tokens.add(50256); // BOS
+            for (int i = 0; i < prompt.length(); i++) {
+                tokens.add((int) prompt.charAt(i) + 1000);
+            }
+            
+            int seqLen = Math.min(tokens.size(), 256);
+            float[] inputData = new float[seqLen];
+            for (int i = 0; i < seqLen; i++) inputData[i] = tokens.get(i);
+            
+            // ОДИН инференс
+            InferRequest request = compiled.createInferRequest();
+            Tensor inputTensor = request.getTensor("input_ids");
+            inputTensor.setData(inputData);
+            
+            long start = System.currentTimeMillis();
+            request.infer();
+            long time = System.currentTimeMillis() - start;
+            
+            // Получаем результат
+            Tensor outputTensor = request.getTensor("logits");
+            java.lang.reflect.Method getData = Tensor.class.getDeclaredMethod("getData");
+            getData.setAccessible(true);
+            Object obj = getData.invoke(outputTensor);
+            
+            if (obj instanceof PointerByReference) {
+                Pointer ptr = ((PointerByReference) obj).getValue();
+                if (ptr != null) {
+                    float[] logits = new float[2000];
+                    ptr.read(0, logits, 0, 2000);
+                    
+                    // Находим следующий токен (первое слово пересказа)
+                    int nextToken = 0;
+                    float maxVal = logits[0];
+                    for (int i = 0; i < 2000; i++) {
+                        if (logits[i] > maxVal) {
+                            maxVal = logits[i];
+                            nextToken = i;
+                        }
+                    }
+                    
+                    // Декодируем
+                    if (nextToken > 1000 && nextToken < 2000) {
+                        char c = (char) (nextToken - 1000);
+                        System.out.println("\n📄 Пересказ:\n" + c);
+                    } else {
+                        System.out.println("\n📄 Пересказ:\n[Токен " + nextToken + "]");
+                    }
+                    
+                    System.out.println("\n⏱️ Время: " + time + " мс");
+                }
+            }
+            
+            core.free();
+            
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
+EOF
+
+javac -cp ".:java-api-1.0-SNAPSHOT.jar:jna.jar" Phi2Summary.java
+java -cp ".:java-api-1.0-SNAPSHOT.jar:jna.jar" Phi2Summary
+
+
+
+ВЫВОД:
+
+✅ OpenVINO загружен
+
+=== PHI-2 ПЕРЕСКАЗ ТЕКСТА ===
+📝 Оригинал:
+Жили-были старик со старухой. Испекла старуха колобок и положила на окошко. Колобок полежал, полежал, да и покатился: с окна на лавку, с лавки на пол, по полу к двери, прыг через порог — да в сени, из сеней на крыльцо, с крыльца на двор, со двора за ворота, дальше и дальше.
+
+🔄 Генерация пересказа...
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x0000723a1faabe97, pid=1470, tid=1471
+#
+# JRE version: OpenJDK Runtime Environment (17.0.18+8) (build 17.0.18+8-Ubuntu-124.04.1)
+# Java VM: OpenJDK 64-Bit Server VM (17.0.18+8-Ubuntu-124.04.1, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libc.so.6+0xabe97]
+
+
+
+//Аналогично выходит с Cotype-Nano-Pro, resnet50-v2-7
+//В примере используется https://huggingface.co/OpenVINO/phi-2-int4-ov
+
+
+//Пример для resnet50-v2-7
+//https://huggingface.co/onnxmodelzoo/resnet50-v2-7
+
+cat > ResNetDetection.java << 'EOF'
+import org.openvino.java.OpenVINO;
+import org.openvino.java.core.Core;
+import org.openvino.java.core.Model;
+import org.openvino.java.core.CompiledModel;
+import org.openvino.java.core.InferRequest;
+import org.openvino.java.core.Tensor;
+import com.sun.jna.Pointer;
+import com.sun.jna.ptr.PointerByReference;
+import java.util.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.Graphics2D;
+import javax.imageio.ImageIO;
+import java.io.*;
+
+public class ResNetDetection {
+    
+    private static Core core;
+    private static CompiledModel model;
+    private static String inputName;
+    private static String outputName;
+    
+    static {
+        OpenVINO.load();
+        System.out.println("✅ OpenVINO загружен");
+    }
+    
+    public static void main(String[] args) {
+        try {
+            System.out.println("\n=== ЗАГРУЗКА RESNET МОДЕЛИ ===");
+            core = new Core();
+            
+            Model ovModel = core.readModel("/home/abulg/resnet_detection_objects/resnet50-v2-7.xml");
+            System.out.println("✅ Модель загружена");
+            
+            // Получаем имена
+            inputName = ((org.openvino.java.core.Input) ovModel.inputs().get(0)).getAnyName();
+            outputName = ((org.openvino.java.core.Output) ovModel.outputs().get(0)).getAnyName();
+            System.out.println("  Вход: " + inputName);
+            System.out.println("  Выход: " + outputName);
+            
+            model = core.compileModel(ovModel, "CPU");
+            System.out.println("✅ Модель скомпилирована для CPU");
+            
+            // Создаем тестовое изображение
+            int size = 224;
+            BufferedImage img = new BufferedImage(size, size, BufferedImage.TYPE_3BYTE_BGR);
+            Graphics2D g = img.createGraphics();
+            g.setColor(java.awt.Color.WHITE);
+            g.fillRect(0, 0, size, size);
+            g.setColor(java.awt.Color.BLACK);
+            g.drawRect(50, 50, 124, 124);
+            g.dispose();
+            
+            System.out.println("\n=== ПОДГОТОВКА ДАННЫХ ===");
+            float[] inputData = preprocessImage(img, size, size);
+            
+            // СОЗДАЕМ ЗАПРОС И ПОЛУЧАЕМ ТЕНЗОР
+            InferRequest request = model.createInferRequest();
+            Tensor inputTensor = request.getTensor(inputName);
+            
+            // ЗАПОЛНЯЕМ ТЕНЗОР ДАННЫМИ
+            inputTensor.setData(inputData);
+            System.out.println("✅ Данные установлены, размер: " + inputData.length);
+            
+            // ИНФЕРЕНС
+            System.out.println("\n=== ИНФЕРЕНС ===");
+            long start = System.currentTimeMillis();
+            request.infer();
+            long time = System.currentTimeMillis() - start;
+            System.out.println("✅ Выполнен за " + time + " мс");
+            
+            // ПОЛУЧАЕМ РЕЗУЛЬТАТ
+            Tensor outputTensor = request.getTensor(outputName);
+            float[] outputData = getTensorData(outputTensor);
+            
+            if (outputData != null && outputData.length > 0) {
+                System.out.println("\n=== РЕЗУЛЬТАТ ===");
+                System.out.println("Размер выхода: " + outputData.length);
+                
+                // Топ-5
+                Integer[] indices = new Integer[Math.min(outputData.length, 100)];
+                for (int i = 0; i < indices.length; i++) indices[i] = i;
+                Arrays.sort(indices, (a, b) -> Float.compare(outputData[b], outputData[a]));
+                
+                System.out.println("\nТоп-5 предсказаний:");
+                for (int i = 0; i < Math.min(5, indices.length); i++) {
+                    System.out.printf("  %d. класс %d: %.4f\n", i+1, indices[i], outputData[indices[i]]);
+                }
+            }
+            
+            core.free();
+            
+        } catch (Exception e) {
+            System.err.println("❌ Ошибка: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private static float[] preprocessImage(BufferedImage image, int w, int h) {
+        java.awt.Image scaled = image.getScaledInstance(w, h, java.awt.Image.SCALE_SMOOTH);
+        BufferedImage resized = new BufferedImage(w, h, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D g = resized.createGraphics();
+        g.drawImage(scaled, 0, 0, null);
+        g.dispose();
+        
+        byte[] pixels = ((DataBufferByte) resized.getRaster().getDataBuffer()).getData();
+        float[] data = new float[3 * w * h];
+        
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int idx = (y * w + x) * 3;
+                float b = (pixels[idx] & 0xFF) / 255.0f;
+                float gv = (pixels[idx + 1] & 0xFF) / 255.0f;
+                float r = (pixels[idx + 2] & 0xFF) / 255.0f;
+                
+                data[y * w + x] = b;
+                data[h * w + y * w + x] = gv;
+                data[2 * h * w + y * w + x] = r;
+            }
+        }
+        return data;
+    }
+    
+    private static float[] getTensorData(Tensor tensor) {
+        try {
+            java.lang.reflect.Method getData = Tensor.class.getDeclaredMethod("getData");
+            getData.setAccessible(true);
+            Object obj = getData.invoke(tensor);
+            
+            if (obj instanceof PointerByReference) {
+                Pointer ptr = ((PointerByReference) obj).getValue();
+                if (ptr != null) {
+                    float[] result = new float[1000];
+                    ptr.read(0, result, 0, 1000);
+                    return result;
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+}
+EOF
+
+javac -cp ".:java-api-1.0-SNAPSHOT.jar:jna.jar" ResNetDetection.java
+java -cp ".:java-api-1.0-SNAPSHOT.jar:jna.jar" ResNetDetection
+
+
+
+ВЫВОД:
+
+
+
+✅ OpenVINO загружен
+
+=== ЗАГРУЗКА RESNET МОДЕЛИ ===
+✅ Модель загружена
+  Вход: data
+  Выход: resnetv24_dense0_fwd
+✅ Модель скомпилирована для CPU
+
+=== ПОДГОТОВКА ДАННЫХ ===
+✅ Данные установлены, размер: 150528
+
+=== ИНФЕРЕНС ===
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x0000716cd124b17d, pid=1629, tid=1630
+#
+# JRE version: OpenJDK Runtime Environment (17.0.18+8) (build 17.0.18+8-Ubuntu-124.04.1)
+# Java VM: OpenJDK 64-Bit Server VM (17.0.18+8-Ubuntu-124.04.1, mixed mode, sharing, tiered, compressed oops, compressed class ptrs, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libopenvino.so.2600+0xa4b17d]  ov::ISyncInferRequest::find_port(ov::Output<ov::Node const> const&) const+0x12d
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/wsl-capture-crash %t %E %p %s" (or dumping to /home/abulg/resnet50-java/core.1629)
+#
+# An error report file with more information is saved as:
+# /home/abulg/resnet50-java/hs_err_pid1629.log
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugs.launchpad.net/ubuntu/+source/openjdk-17
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+
+
+
+
