@@ -73,28 +73,27 @@ class OpenVinoEngine(
                 null
             }
 
-        if (bitmap == null) {
+        return if (bitmap != null) {
+            val detections = detectYolo(bitmap)
+            bitmap.recycle()
+
+            if (detections.isNotEmpty()) {
+                val tags =
+                    detections
+                        .map { it.classId }
+                        .distinct()
+                        .mapNotNull { classId -> getClassName(classId) }
+                        .joinToString(",")
+                debugLog { "Detected tags: $tags" }
+                tags
+            } else {
+                debugLog { "No objects detected" }
+                ""
+            }
+        } else {
             Log.e(TAG, "Failed to load image: $imageSource")
-            return ""
+            ""
         }
-
-        val detections = detectYolo(bitmap)
-        bitmap.recycle()
-
-        if (detections.isEmpty()) {
-            debugLog { "No objects detected" }
-            return ""
-        }
-
-        val tags =
-            detections
-                .map { it.classId }
-                .distinct()
-                .mapNotNull { classId -> getClassName(classId) }
-                .joinToString(",")
-
-        debugLog { "Detected tags: $tags" }
-        return tags
     }
 
     private fun detectYolo(bitmap: Bitmap): List<YoloDetection> {
@@ -183,49 +182,50 @@ class OpenVinoEngine(
             return emptyList()
         }
 
-        return try {
+        return runCatching {
             val outputData = getTensorDataAsFloatArray(outputTensor)
+
             if (outputData.isEmpty()) {
                 Log.e(TAG, "Output data is empty")
                 return emptyList()
             }
 
-            val detections = mutableListOf<YoloDetection>()
-
-            if (outputData.size >= MAX_DETECTIONS * 6) {
-                for (i in 0 until MAX_DETECTIONS) {
-                    val base = i * 6
-                    if (base + 5 >= outputData.size) break
-
-                    val x1 = outputData[base] * INPUT_SIZE
-                    val y1 = outputData[base + 1] * INPUT_SIZE
-                    val x2 = outputData[base + 2] * INPUT_SIZE
-                    val y2 = outputData[base + 3] * INPUT_SIZE
-                    val confidence = outputData[base + 4]
-                    val classId = outputData[base + 5].toInt()
-
-                    if (confidence > CONF_THRESHOLD) {
-                        detections.add(
-                            YoloDetection(
-                                x1 = x1.coerceIn(0f, INPUT_SIZE.toFloat()),
-                                y1 = y1.coerceIn(0f, INPUT_SIZE.toFloat()),
-                                x2 = x2.coerceIn(0f, INPUT_SIZE.toFloat()),
-                                y2 = y2.coerceIn(0f, INPUT_SIZE.toFloat()),
-                                confidence = confidence,
-                                classId = classId,
-                            ),
-                        )
-                    }
-                }
-            } else {
-                Log.w(TAG, "Unexpected output format, size: ${outputData.size}")
-            }
-
+            val detections = buildDetections(outputData)
             applyNMS(detections, IOU_THRESHOLD)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to parse output tensor", e)
+        }.getOrElse { exception ->
+            Log.e(TAG, "Failed to parse output tensor", exception)
             emptyList()
         }
+    }
+
+    private fun buildDetections(outputData: FloatArray): List<YoloDetection> {
+        val detections = mutableListOf<YoloDetection>()
+
+        if (outputData.size < MAX_DETECTIONS * 6) {
+            Log.w(TAG, "Unexpected output format, size: ${outputData.size}")
+            return detections
+        }
+
+        for (i in 0 until MAX_DETECTIONS) {
+            val base = i * 6
+            if (base + 5 >= outputData.size) break
+
+            val confidence = outputData[base + 4]
+            if (confidence <= CONF_THRESHOLD) continue
+
+            detections.add(
+                YoloDetection(
+                    x1 = (outputData[base] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
+                    y1 = (outputData[base + 1] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
+                    x2 = (outputData[base + 2] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
+                    y2 = (outputData[base + 3] * INPUT_SIZE).coerceIn(0f, INPUT_SIZE.toFloat()),
+                    confidence = confidence,
+                    classId = outputData[base + 5].toInt(),
+                ),
+            )
+        }
+
+        return detections
     }
 
     private fun getTensorDataAsFloatArray(tensor: Tensor): FloatArray =
