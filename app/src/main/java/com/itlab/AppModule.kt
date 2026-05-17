@@ -87,7 +87,11 @@ val appModule =
                 getNoteUseCase = get(),
             )
         }
-        single { OpenVinoEngine(fileSystem = get()) }
+        single {
+            val context = androidContext()
+            val modelPath = OpenVinoEngine.getOptimalModelPath(context)
+            OpenVinoEngine(fileSystem = get(), modelXmlPath = modelPath)
+        }
         single { ResultProcessor() }
         single<NoteAiService> {
             OpenVinoNoteAiService(engine = get(), processor = get())

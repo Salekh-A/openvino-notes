@@ -15,7 +15,7 @@ import org.intel.openvino.Tensor
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-
+import android.app.ActivityManager
 @Suppress("TooGenericExceptionCaught", "TooManyFunctions")
 class OpenVinoEngine(
     private val fileSystem: FileSystemProvider,
@@ -33,6 +33,24 @@ class OpenVinoEngine(
         private const val CONF_THRESHOLD = 0.35f
         private const val IOU_THRESHOLD = 0.45f
         private const val MAX_DETECTIONS = 300
+
+        fun getOptimalModelPath(context: Context): String {
+            val coreCount = Runtime.getRuntime().availableProcessors()
+            val totalRam = getTotalRamMB(context)
+
+            return if (coreCount <= 4 || totalRam <= 2048) {
+                "models/yolo26n_openvino_model/yolo26n.xml"
+            } else {
+                "models/yolov10n_openvino_model/yolov10n.xml"
+            }
+        }
+
+        private fun getTotalRamMB(context: Context): Long {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memInfo)
+            return memInfo.totalMem / (1024 * 1024)
+        }
     }
 
     private var core: Core? = null
