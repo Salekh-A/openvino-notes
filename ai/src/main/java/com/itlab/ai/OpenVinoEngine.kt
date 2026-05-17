@@ -15,6 +15,9 @@ import org.intel.openvino.Tensor
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
+import android.app.ActivityManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Suppress("TooGenericExceptionCaught", "TooManyFunctions")
 class OpenVinoEngine(
@@ -33,6 +36,24 @@ class OpenVinoEngine(
         private const val CONF_THRESHOLD = 0.35f
         private const val IOU_THRESHOLD = 0.45f
         private const val MAX_DETECTIONS = 300
+
+        fun getOptimalModelPath(context: Context): String {
+            val coreCount = Runtime.getRuntime().availableProcessors()
+            val totalRam = getTotalRamMB(context)
+
+            return if (coreCount <= 4 || totalRam <= 2048) {
+                "models/yolo26n_openvino_model/yolo26n.xml"
+            } else {
+                "models/yolov10n_openvino_model/yolov10n.xml"
+            }
+        }
+
+        private fun getTotalRamMB(context: Context): Long {
+            val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+            val memInfo = ActivityManager.MemoryInfo()
+            activityManager.getMemoryInfo(memInfo)
+            return memInfo.totalMem / (1024 * 1024)
+        }
     }
 
     private var core: Core? = null
@@ -41,6 +62,8 @@ class OpenVinoEngine(
     private var inferRequest: InferRequest? = null
 
     private var isInitialized = false
+
+    private var initAttempted = false
     private var activeModelXmlPath = modelXmlPath
 
     private var classNames: List<String> = emptyList()
@@ -63,7 +86,7 @@ class OpenVinoEngine(
 
     fun runLlmTagging(text: String): String = text
 
-    fun runYoloTagging(imageSource: String): String {
+    suspend fun runYoloTagging(imageSource: String): String = withContext(Dispatchers.IO)  {
         debugLog { "Running YOLO tagging on: $imageSource" }
 
         val bitmap =
@@ -74,7 +97,7 @@ class OpenVinoEngine(
                 null
             }
 
-        return if (bitmap != null) {
+        return@withContext if (bitmap != null) {
             val detections = detectYolo(bitmap)
             bitmap.recycle()
 
@@ -97,10 +120,8 @@ class OpenVinoEngine(
         }
     }
 
-    private fun detectYolo(bitmap: Bitmap): List<YoloDetection> {
-        if (!isInitialized) {
-            initialize()
-        }
+    private suspend fun detectYolo(bitmap: Bitmap): List<YoloDetection>{
+        if (!ensureInitialized()) return emptyList()
 
         return try {
             debugLog { "Starting YOLO detection..." }
@@ -296,17 +317,18 @@ class OpenVinoEngine(
         return if (union > 0) intersection / union else 0f
     }
 
-    fun initialize(): Boolean {
+    suspend fun initialize(): Boolean = withContext(Dispatchers.IO) {
         debugLog { "Initializing OpenVINO Engine..." }
         debugLog { "Model path: $modelXmlPath" }
         isInitialized = false
 
         val fs = fileSystem
-        return when {
+        return@withContext when {
             fs == null -> {
                 Log.e(TAG, "FileSystemProvider is required to initialize OpenVINO")
                 false
             }
+
             else -> {
                 classNames = loadClassNames(fs)
                 if (classNames.isEmpty()) {
@@ -315,6 +337,15 @@ class OpenVinoEngine(
                 initializeWithResolvedModel(fs)
             }
         }
+    }
+
+    private suspend fun ensureInitialized(): Boolean {
+        if (isInitialized) return true
+        if (initAttempted) return false
+
+        initAttempted = true
+        isInitialized = initialize()
+        return isInitialized
     }
 
     private fun loadClassNames(fs: FileSystemProvider): List<String> =
@@ -520,7 +551,7 @@ class OpenVinoEngine(
         }
     }
 
-    fun test(): Boolean =
+    suspend fun test(): Boolean =
         try {
             debugLog { "=== Starting OpenVINO Engine Test ===" }
             initialize()
