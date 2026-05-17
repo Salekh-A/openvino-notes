@@ -1,5 +1,10 @@
 package com.itlab.notes.di
 
+import com.itlab.ai.OpenVinoEngine
+import com.itlab.ai.OpenVinoNoteAiService
+import com.itlab.ai.ResultProcessor
+import com.itlab.domain.ai.NoteAiService
+import com.itlab.domain.app.FileSystemProvider
 import com.itlab.domain.usecase.folderusecase.CreateFolderUseCase
 import com.itlab.domain.usecase.folderusecase.DeleteFolderUseCase
 import com.itlab.domain.usecase.folderusecase.GetFolderUseCase
@@ -11,8 +16,10 @@ import com.itlab.domain.usecase.noteusecase.MoveNoteToFolderUseCase
 import com.itlab.domain.usecase.noteusecase.ObserveNotesByFolderUseCase
 import com.itlab.domain.usecase.noteusecase.ObserveNotesUseCase
 import com.itlab.domain.usecase.noteusecase.UpdateNoteUseCase
+import com.itlab.notes.AndroidFileSystemProvider
 import com.itlab.notes.ui.NotesUseCases
 import com.itlab.notes.ui.NotesViewModel
+import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -43,6 +50,14 @@ val appModule =
                 moveNoteToFolderUseCase = get(),
                 observeNotesUseCase = get(),
             )
+        }
+        single { OpenVinoEngine(fileSystem = get()) }
+        single { ResultProcessor() }
+        single<NoteAiService> {
+            OpenVinoNoteAiService(engine = get(), processor = get())
+        }
+        single<FileSystemProvider> {
+            AndroidFileSystemProvider(androidContext())
         }
 
         viewModel {

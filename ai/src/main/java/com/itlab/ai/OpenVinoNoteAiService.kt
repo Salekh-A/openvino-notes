@@ -1,6 +1,7 @@
 package com.itlab.ai
 
 import com.itlab.domain.ai.NoteAiService
+import kotlin.String
 
 class OpenVinoNoteAiService(
     private val engine: OpenVinoEngine,

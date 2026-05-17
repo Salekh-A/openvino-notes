@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.core.graphics.scale
+import com.itlab.domain.app.FileSystemProvider
 import org.intel.openvino.CompiledModel
 import org.intel.openvino.Core
 import org.intel.openvino.InferRequest
@@ -17,7 +18,7 @@ import java.io.IOException
 
 @Suppress("TooGenericExceptionCaught", "TooManyFunctions")
 class OpenVinoEngine(
-    private val context: Context? = null,
+    private val fileSystem: FileSystemProvider,
     private val modelXmlPath: String = "",
     private val deviceName: String = "CPU",
 ) {
@@ -98,8 +99,7 @@ class OpenVinoEngine(
 
     private fun detectYolo(bitmap: Bitmap): List<YoloDetection> {
         if (!isInitialized) {
-            Log.e(TAG, "Engine not initialized")
-            return emptyList()
+            initialize()
         }
 
         return try {
@@ -301,58 +301,72 @@ class OpenVinoEngine(
         debugLog { "Model path: $modelXmlPath" }
         isInitialized = false
 
-        val appContext = context
+        val fs = fileSystem
         return when {
-            appContext == null -> {
-                Log.e(TAG, "Android context is required to initialize OpenVINO")
+            fs == null -> {
+                Log.e(TAG, "FileSystemProvider is required to initialize OpenVINO")
                 false
             }
             else -> {
-                // Загружаем имена классов
-                classNames = loadClassNames(appContext)
+                classNames = loadClassNames(fs)
                 if (classNames.isEmpty()) {
                     Log.w(TAG, "No class names loaded, using IDs instead")
                 }
-                initializeWithResolvedModel(appContext)
+                initializeWithResolvedModel(fs)
             }
         }
     }
 
-    private fun initializeWithResolvedModel(appContext: Context): Boolean {
-        val resolvedModelXmlPath = resolveModelXmlPath(appContext) ?: return false
+    private fun loadClassNames(fs: FileSystemProvider): List<String> =
+        try {
+            val names = mutableListOf<String>()
+            fs.openAsset(COCO_NAMES_FILE).bufferedReader().useLines { lines ->
+                lines.forEach { line ->
+                    if (line.isNotBlank()) {
+                        names.add(line.trim())
+                    }
+                }
+            }
+            debugLog { "Loaded ${names.size} classes from $COCO_NAMES_FILE" }
+            names
+        } catch (e: IOException) {
+            Log.e(TAG, "Failed to load $COCO_NAMES_FILE", e)
+            emptyList()
+        }
+
+    private fun initializeWithResolvedModel(fs: FileSystemProvider): Boolean {
+        val resolvedModelXmlPath = resolveModelXmlPath(fs) ?: return false
         activeModelXmlPath = resolvedModelXmlPath
 
         return if (!File(activeModelXmlPath).exists()) {
             Log.e(TAG, "Model file not found: $activeModelXmlPath")
             false
         } else {
-            initializeOpenVino(appContext)
+            initializeOpenVino(fs)
         }
     }
 
-    private fun resolveModelXmlPath(appContext: Context): String? {
-        val modelDir = File(appContext.filesDir, DEFAULT_MODEL_ASSET_DIR)
+    private fun resolveModelXmlPath(fs: FileSystemProvider): String? {
+        val modelDir = File(fs.getFilesDir(), DEFAULT_MODEL_ASSET_DIR)
         val modelXml = File(modelDir, DEFAULT_MODEL_XML)
-        val resolvedPath =
-            when {
-                modelXmlPath.isNotBlank() -> modelXmlPath
-                modelXml.exists() -> modelXml.absolutePath
-                copyAssetDirectory(appContext, DEFAULT_MODEL_ASSET_DIR, modelDir) -> modelXml.absolutePath
-                else -> {
-                    Log.e(TAG, "Bundled model assets are missing: $DEFAULT_MODEL_ASSET_DIR")
-                    null
-                }
-            }
 
-        return resolvedPath
+        return when {
+            modelXmlPath.isNotBlank() -> modelXmlPath
+            modelXml.exists() -> modelXml.absolutePath
+            copyAssetDirectory(fs, DEFAULT_MODEL_ASSET_DIR, modelDir) -> modelXml.absolutePath
+            else -> {
+                Log.e(TAG, "Bundled model assets are missing: $DEFAULT_MODEL_ASSET_DIR")
+                null
+            }
+        }
     }
 
     private fun copyAssetDirectory(
-        appContext: Context,
+        fs: FileSystemProvider,
         assetPath: String,
         targetDir: File,
     ): Boolean {
-        val entries = appContext.assets.list(assetPath).orEmpty()
+        val entries = fs.listAssets(assetPath).orEmpty()
         if (entries.isEmpty()) {
             return false
         }
@@ -361,23 +375,23 @@ class OpenVinoEngine(
         return entries.all { entry ->
             val childAssetPath = "$assetPath/$entry"
             val childTarget = File(targetDir, entry)
-            val childEntries = appContext.assets.list(childAssetPath).orEmpty()
+            val childEntries = fs.listAssets(childAssetPath).orEmpty()
             if (childEntries.isEmpty()) {
-                copyAssetFile(appContext, childAssetPath, childTarget)
+                copyAssetFile(fs, childAssetPath, childTarget)
             } else {
-                copyAssetDirectory(appContext, childAssetPath, childTarget)
+                copyAssetDirectory(fs, childAssetPath, childTarget)
             }
         }
     }
 
     private fun copyAssetFile(
-        appContext: Context,
+        fs: FileSystemProvider,
         assetPath: String,
         targetFile: File,
     ): Boolean =
         try {
             targetFile.parentFile?.mkdirs()
-            appContext.assets.open(assetPath).use { input ->
+            fs.openAsset(assetPath).use { input ->
                 FileOutputStream(targetFile).use { output ->
                     input.copyTo(output)
                 }
@@ -388,9 +402,9 @@ class OpenVinoEngine(
             false
         }
 
-    private fun initializeOpenVino(appContext: Context): Boolean =
+    private fun initializeOpenVino(fs: FileSystemProvider): Boolean =
         try {
-            val pluginsFile = preparePluginsFile(appContext)
+            val pluginsFile = preparePluginsFile(fs)
             val activeCore = createCore(pluginsFile)
             val devices = activeCore.get_available_devices()
             debugLog { "Available devices: $devices" }
@@ -409,20 +423,20 @@ class OpenVinoEngine(
             false
         }
 
-    private fun preparePluginsFile(appContext: Context): File {
-        val pluginsFile = File(appContext.filesDir, "plugins.xml")
+    private fun preparePluginsFile(fs: FileSystemProvider): File {
+        val pluginsFile = File(fs.getFilesDir(), "plugins.xml")
         if (!pluginsFile.exists()) {
-            copyPluginsFile(appContext, pluginsFile)
+            copyPluginsFile(fs, pluginsFile)
         }
         return pluginsFile
     }
 
     private fun copyPluginsFile(
-        appContext: Context,
+        fs: FileSystemProvider,
         pluginsFile: File,
     ) {
         try {
-            appContext.assets.open("plugins.xml").use { input ->
+            fs.openAsset("plugins.xml").use { input ->
                 FileOutputStream(pluginsFile).use { output ->
                     input.copyTo(output)
                 }
