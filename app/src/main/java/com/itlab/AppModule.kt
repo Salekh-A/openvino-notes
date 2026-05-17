@@ -22,18 +22,18 @@ import com.itlab.domain.usecase.noteusecase.SearchNotesUseCase
 import com.itlab.domain.usecase.noteusecase.SwitchFavoriteUseCase
 import com.itlab.domain.usecase.noteusecase.UpdateNoteUseCase
 import com.itlab.domain.usecase.noteusecase.ValidateDuplicateNoteTitleUseCase
+import com.itlab.notes.AndroidFileSystemProvider
 import com.itlab.notes.auth.AppSessionPreferences
 import com.itlab.notes.auth.ClearLocalDataOnSignOut
 import com.itlab.notes.onboarding.OnboardingPreferences
 import com.itlab.notes.onboarding.OnboardingViewModel
-import com.itlab.notes.AndroidFileSystemProvider
 import com.itlab.notes.ui.NotesUseCases
 import com.itlab.notes.ui.NotesViewModel
 import com.itlab.notes.ui.auth.AuthViewModel
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val appModule =
