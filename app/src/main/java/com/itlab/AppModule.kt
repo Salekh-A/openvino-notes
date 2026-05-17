@@ -1,9 +1,5 @@
 package com.itlab
 
-import com.itlab.ai.OpenVinoEngine
-import com.itlab.ai.OpenVinoNoteAiService
-import com.itlab.ai.ResultProcessor
-import com.itlab.domain.ai.NoteAiService
 import com.itlab.domain.app.FileSystemProvider
 import com.itlab.domain.usecase.folderusecase.CreateFolderUseCase
 import com.itlab.domain.usecase.folderusecase.DeleteFolderUseCase
@@ -22,18 +18,18 @@ import com.itlab.domain.usecase.noteusecase.SearchNotesUseCase
 import com.itlab.domain.usecase.noteusecase.SwitchFavoriteUseCase
 import com.itlab.domain.usecase.noteusecase.UpdateNoteUseCase
 import com.itlab.domain.usecase.noteusecase.ValidateDuplicateNoteTitleUseCase
+import com.itlab.notes.AndroidFileSystemProvider
 import com.itlab.notes.auth.AppSessionPreferences
 import com.itlab.notes.auth.ClearLocalDataOnSignOut
 import com.itlab.notes.onboarding.OnboardingPreferences
 import com.itlab.notes.onboarding.OnboardingViewModel
-import com.itlab.notes.AndroidFileSystemProvider
 import com.itlab.notes.ui.NotesUseCases
 import com.itlab.notes.ui.NotesViewModel
 import com.itlab.notes.ui.auth.AuthViewModel
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
-import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val appModule =
@@ -86,15 +82,6 @@ val appModule =
                 getAllFavoritesUseCase = get(),
                 getNoteUseCase = get(),
             )
-        }
-        single {
-            val context = androidContext()
-            val modelPath = OpenVinoEngine.getOptimalModelPath(context)
-            OpenVinoEngine(fileSystem = get(), modelXmlPath = modelPath)
-        }
-        single { ResultProcessor() }
-        single<NoteAiService> {
-            OpenVinoNoteAiService(engine = get(), processor = get())
         }
         single<FileSystemProvider> {
             AndroidFileSystemProvider(androidContext())
