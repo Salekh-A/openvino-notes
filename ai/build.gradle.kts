@@ -92,10 +92,6 @@ tasks
         dependsOn(prepareYolo26Model)
     }
 
-tasks.matching { it.name == "mergeDebugAndroidTestAssets" }.configureEach {
-    dependsOn("copyYoloToTestAssets")
-}
-
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
