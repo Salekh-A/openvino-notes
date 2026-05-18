@@ -27,7 +27,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
+      - name: Explain unsigned fork pull request release build
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        shell: bash
+        run: echo "Release signing secrets are unavailable to fork pull_request workflows; building unsigned release artifacts for CI."
+
       - name: Verify release signing secrets are configured
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         env:
           ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
@@ -37,6 +43,7 @@ jobs:
         run: bash .github/scripts/release/verify_release_signing.sh
 
       - name: Materialize release signing from GitHub secrets
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         env:
           ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
@@ -77,7 +84,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
+      - name: Explain unsigned fork pull request release lint
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository
+        shell: bash
+        run: echo "Release signing secrets are unavailable to fork pull_request workflows; linting unsigned release variants for CI."
+
       - name: Verify release signing secrets are configured
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         env:
           ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
@@ -87,6 +100,7 @@ jobs:
         run: bash .github/scripts/release/verify_release_signing.sh
 
       - name: Materialize release signing from GitHub secrets
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         env:
           ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
