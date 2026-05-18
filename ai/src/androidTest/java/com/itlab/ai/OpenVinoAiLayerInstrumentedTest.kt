@@ -93,7 +93,7 @@ class OpenVinoAiLayerInstrumentedTest {
         }
 
     @Test
-    fun testYoloModelsExistInAssets() = runBlocking {
+    fun copyYoloToTestAssets() = runBlocking {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
         // Проверяем наличие моделей в assets
@@ -111,7 +111,6 @@ class OpenVinoAiLayerInstrumentedTest {
             yolov10nFiles?.contains("yolov10n.bin") == true
 
         assertTrue("Должна быть хотя бы одна модель", hasYolo26n || hasYolov10n)
-
         if (hasYolo26n) println("✅ YOLO26n найдена в assets")
         if (hasYolov10n) println("✅ YOLOv10n найдена в assets")
     }

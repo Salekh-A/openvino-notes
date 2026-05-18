@@ -1,4 +1,4 @@
-package com.itlab
+package com.itlab.notes.ui.notes
 
 import com.itlab.ai.OpenVinoEngine
 import com.itlab.ai.OpenVinoNoteAiService
