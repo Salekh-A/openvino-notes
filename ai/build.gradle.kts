@@ -92,7 +92,6 @@ tasks
         dependsOn(prepareYolo26Model)
     }
 
-
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_11)
