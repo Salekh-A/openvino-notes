@@ -17,7 +17,15 @@ sealed interface NotesUiScreen {
     data class NoteEditor(
         val directory: DirectoryItemUi,
         val note: NoteItemUi,
+        val cloudSyncStatus: EditorCloudSyncStatus = EditorCloudSyncStatus.Idle,
     ) : NotesUiScreen
+}
+
+/** Cloud upload state shown in the editor top bar. */
+enum class EditorCloudSyncStatus {
+    Idle,
+    Uploading,
+    Error,
 }
 
 data class NotesUiState(
@@ -26,6 +34,10 @@ data class NotesUiState(
     val notes: List<NoteItemUi> = emptyList(),
     val notesSearchQuery: String = "",
     val directorySearchQuery: String = "",
+    /** Note ids currently uploading to cloud (visible in list + editor). */
+    val noteIdsUploading: Set<String> = emptySet(),
+    /** Pull-to-refresh / download from cloud in progress. */
+    val isCloudDownloadActive: Boolean = false,
 )
 
 sealed interface NotesUiEvent {
@@ -53,10 +65,6 @@ sealed interface NotesUiEvent {
 
     /** Saves pending editor changes (if any), then returns to the notes list. */
     data class LeaveEditor(
-        val note: NoteItemUi,
-    ) : NotesUiEvent
-
-    data class SaveNote(
         val note: NoteItemUi,
     ) : NotesUiEvent
 
@@ -90,6 +98,8 @@ sealed interface NotesUiEvent {
     data class ToggleNoteFavorite(
         val noteId: String,
     ) : NotesUiEvent
+
+    data object SyncCloud : NotesUiEvent
 }
 
 interface NotesViewModelContract {

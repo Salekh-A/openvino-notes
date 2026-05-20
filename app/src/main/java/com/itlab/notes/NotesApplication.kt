@@ -13,7 +13,7 @@ class NotesApplication : Application() {
         startKoin {
             androidContext(this@NotesApplication)
             workManagerFactory()
-            modules(listOf(appModule, dataModule))
+            modules(listOf(dataModule, appModule))
         }
     }
 }

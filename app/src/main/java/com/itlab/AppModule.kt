@@ -1,5 +1,6 @@
 package com.itlab
 
+import com.itlab.domain.repository.AuthRepository
 import com.itlab.domain.usecase.folderusecase.CreateFolderUseCase
 import com.itlab.domain.usecase.folderusecase.DeleteFolderUseCase
 import com.itlab.domain.usecase.folderusecase.GetFolderUseCase
@@ -18,7 +19,8 @@ import com.itlab.domain.usecase.noteusecase.SwitchFavoriteUseCase
 import com.itlab.domain.usecase.noteusecase.UpdateNoteUseCase
 import com.itlab.domain.usecase.noteusecase.ValidateDuplicateNoteTitleUseCase
 import com.itlab.notes.auth.AppSessionPreferences
-import com.itlab.notes.auth.ClearLocalDataOnSignOut
+import com.itlab.notes.auth.NotesSessionHolder
+import com.itlab.notes.auth.SessionAwareAuthRepository
 import com.itlab.notes.onboarding.OnboardingPreferences
 import com.itlab.notes.onboarding.OnboardingViewModel
 import com.itlab.notes.ui.NotesUseCases
@@ -31,35 +33,29 @@ import org.koin.dsl.module
 
 val appModule =
     module {
+        single { NotesSessionHolder() }
+        single<AuthRepository> { SessionAwareAuthRepository(get(), get()) }
         single { OnboardingPreferences(androidApplication()) }
         single { AppSessionPreferences(androidApplication()) }
-        factory { ValidateDuplicateNoteTitleUseCase(get()) }
-        factory { CreateNoteUseCase(get()) }
-        factory { CreateFolderUseCase(get()) }
-        factory { DeleteFolderUseCase(get(), get()) }
-        factory { DeleteNoteUseCase(get()) }
-        factory { UpdateNoteUseCase(get()) }
-        factory { UpdateFolderUseCase(get()) }
-        factory { GetFolderUseCase(get()) }
-        factory { ObserveNotesByFolderUseCase(get()) }
-        factory { ObserveFoldersUseCase(get()) }
-        factory { MoveNoteToFolderUseCase(get(), get()) }
-        factory { ObserveNotesUseCase(get()) }
+        factory { ValidateDuplicateNoteTitleUseCase(get(), get()) }
+        factory { CreateNoteUseCase(get(), get()) }
+        factory { CreateFolderUseCase(get(), get()) }
+        factory { DeleteFolderUseCase(get(), get(), get()) }
+        factory { DeleteNoteUseCase(get(), get()) }
+        factory { UpdateNoteUseCase(get(), get()) }
+        factory { UpdateFolderUseCase(get(), get()) }
+        factory { GetFolderUseCase(get(), get()) }
+        factory { ObserveNotesByFolderUseCase(get(), get()) }
+        factory { ObserveFoldersUseCase(get(), get()) }
+        factory { MoveNoteToFolderUseCase(get(), get(), get()) }
+        factory { ObserveNotesUseCase(get(), get()) }
         factory { GetUserIdUseCase(get()) }
-        factory { SearchNotesUseCase(get()) }
-        factory { SwitchFavoriteUseCase(get()) }
-        factory { GetAllFavoritesUseCase(get()) }
-        factory { GetNoteUseCase(get()) }
-        factory { UpdateFolderUseCase(get()) }
-        factory { GetFolderUseCase(get()) }
-        factory {
-            ClearLocalDataOnSignOut(
-                observeNotesUseCase = get(),
-                deleteNoteUseCase = get(),
-                observeFoldersUseCase = get(),
-                deleteFolderUseCase = get(),
-            )
-        }
+        factory { SearchNotesUseCase(get(), get()) }
+        factory { SwitchFavoriteUseCase(get(), get()) }
+        factory { GetAllFavoritesUseCase(get(), get()) }
+        factory { GetNoteUseCase(get(), get()) }
+        factory { UpdateFolderUseCase(get(), get()) }
+        factory { GetFolderUseCase(get(), get()) }
         factory {
             NotesUseCases(
                 createFolderUseCase = get(),
@@ -81,14 +77,22 @@ val appModule =
             )
         }
 
-        viewModelOf(::NotesViewModel)
+        viewModel {
+            NotesViewModel(
+                useCases = get(),
+                syncScheduler = get(),
+                syncManager = get(),
+                syncCheckpointStore = get(),
+            )
+        }
         viewModelOf(::OnboardingViewModel)
         viewModel {
             AuthViewModel(
                 firebaseAuth = get(),
                 app = androidApplication(),
                 appSessionPreferences = get(),
-                clearLocalDataOnSignOut = get(),
+                syncCheckpointStore = get(),
+                notesSessionHolder = get(),
             )
         }
     }
